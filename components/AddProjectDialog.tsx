@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import Modal from "../../components/Modal";
-import fw from "../../lib/FetchWrapper";
-import { formatError } from "../../lib/Utils";
+import Modal from "./Modal";
+import fw from "../lib/FetchWrapper";
+import { formatError } from "../lib/Utils";
 
 interface Props {
   show: boolean;

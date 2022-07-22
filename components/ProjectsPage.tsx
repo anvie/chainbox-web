@@ -1,9 +1,9 @@
 import styles from "../styles/Sections.module.sass";
 import Image from "next/image";
-import Button from "../../components/Button";
+import Button from "./Button";
 import { useEffect, useState } from "react";
 import AddProjectDialog from "./AddProjectDialog";
-import fw from "../../lib/FetchWrapper";
+import fw from "../lib/FetchWrapper";
 import ProjectItem, {ItemProps} from "./ProjectItem";
 
 const ProjectsPage = () => {

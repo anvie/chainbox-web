@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
-import Button from "../../components/Button";
-import SmallButton from "../../components/SmallButton";
-import fw from "../../lib/FetchWrapper";
+import Button from "./Button";
+import SmallButton from "./SmallButton";
+import fw from "../lib/FetchWrapper";
 
 export interface ItemProps {
   name: string;

@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import fw from "../../lib/FetchWrapper";
 import { userAccess } from "../../lib/UserAccess";
 import { shortenAddress } from "../../lib/Utils";
-import ProjectsPage from "./ProjectsPage";
+import ProjectsPage from "../../components/ProjectsPage";
 // import { UserContext } from "../../lib/UserContext";
 
 const messageFormat =

@@ -14,11 +14,11 @@ const Section1 = () => {
         </div>
 
         <p className={`${styles.description} max-w-xl`}>
-        Chainbox is a tool that simplifies the process of creating a new web3 project.
+        Chainbox is a tool to simplify the process of creating a Web3 project.
         </p>
         <p className={`${styles.description} max-w-xl pt-2`}>
-        From creating smart contract to deploying them into blockchain,
-        and creating web frontend.
+        From creating smart contract, deploying into blockchain,
+        and integrate with the web frontend.
         </p>
         <p className={`${styles.description} max-w-xl pt-2`}>
         All in one place.
