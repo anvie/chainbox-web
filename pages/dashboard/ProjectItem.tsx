@@ -43,7 +43,7 @@ const ProjectItem: FC<ProjectItemProps> = ({ onClick, item }) => {
       });
   };
 
-  return (
+  return item ? (
     <div className="flex mt-2 flex-col justify-right bg-slate-200 text-gray-600 shadow-md w-60">
       <div className="flex text-center w-full">
         <div className="bg-orange-300 p-1 w-full">{item.kind}</div>
@@ -69,7 +69,7 @@ const ProjectItem: FC<ProjectItemProps> = ({ onClick, item }) => {
         />
       </div>
     </div>
-  );
+  ) : <div />;
 };
 
 export default ProjectItem;
