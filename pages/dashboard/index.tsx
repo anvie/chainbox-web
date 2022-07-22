@@ -27,7 +27,8 @@ function isSupportedNetwork(chainId: number): boolean {
   if (process.env.NODE_ENV === "development") {
     return true;
   }
-  return chainId === 1; // Ethereum Mainnet
+  return chainId === 1 // Ethereum Mainnet 
+    || chainId === 4; // Rinkeby Mainnet
 }
 
 const genMessageToSign = (address: string): string => {
