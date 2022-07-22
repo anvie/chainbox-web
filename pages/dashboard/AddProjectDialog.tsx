@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import Modal from "../../components/Modal";
 import fw from "../../lib/FetchWrapper";
+import { formatError } from "../../lib/Utils";
 
 interface Props {
   show: boolean;
@@ -18,6 +19,7 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
   // const [kind, setKind] = useState("");
   // const [capped, setCapped] = useState(false);
   // const [maxSupply, setMaxSupply] = useState("");
+  const [error, setError] = useState("");
 
   const onSubmit = (event: any) => {
     event.preventDefault();
@@ -32,7 +34,8 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
       "🚀 ~ file: AddProjectDialog.tsx ~ line 31 ~ onSubmit ~ capped",
       capped
     );
-    const maxSupply = event.target.maxSupply.value;
+    const maxSupply:number = parseInt(event.target.maxSupply.value);
+    setError("");
 
     fw.post(`/v1/add-project`, {
       name,
@@ -43,11 +46,16 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
       kind,
       capped,
       maxSupply,
-    }).then(({ result }) => {
-      if (result) {
+    }).then((resp) => {
+      if (resp.result) {
         onSuccess();
         onClose();
+      }else if (resp.errors || resp.error){
+        setError(formatError(resp.errors || resp.error));
       }
+    }).catch( (err)  =>{
+      console.log("🚀 ~ file: AddProjectDialog.tsx ~ line 57 ~ onSubmit ~ err", err)
+      setError(err.message);
     });
   };
 
@@ -157,6 +165,10 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
             min="0"
             defaultValue="0"
           />
+
+          {error && <div className="bg-red-300 p-2 mb-5">
+            {error}
+          </div>}
 
           <button
             type="submit"

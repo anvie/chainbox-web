@@ -26,8 +26,8 @@ const ProjectsPage = () => {
   }, []);
 
   return (
-    <div id="home" className="w-full">
-      <div className="pb-10 w-full flex flex-col justify-center items-center">
+    <div id="home" className="w-auto">
+      <div className="pb-10 w-auto flex flex-col justify-center items-left">
         <div className="flex justify-center items-center">
           <h1>Projects</h1>
           <div className="ml-10">
@@ -35,7 +35,11 @@ const ProjectsPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col justify-center items-center pt-10">
+        <div className="flex items-left w-full">
+        <div>Total {projects.length} project(s)</div>
+        </div>
+
+        <div className="flex flex-wrap space-x-2 justify-center items-center pt-10">
           {projects.map((project) => (
             <ProjectItem item={project} onClick={()=>{}} key={project._id}/>
           ))}
