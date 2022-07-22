@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
     steps:
       - uses: actions/checkout@v2
 
