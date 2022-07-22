@@ -32,16 +32,19 @@ jobs:
 
       - name: Deploy with rsync
         run: rsync -avzrhcP -e "ssh -p ${{ secrets.SSH_PORT }}" ./out/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/www/chainbox-frontend/
-      
-      - name: Sync node_modules
-        run: rsync -avzrhcP -e "ssh -p ${{ secrets.SSH_PORT }}" ./node_modules ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/www/chainbox-frontend/
 
-      - name: Restart Node Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            sudo -u www pm2 restart frontend
+      - name: Set ownership
+        run: chown -R www:www /home/www/chainbox-frontend
+      
+      # - name: Sync node_modules
+      #   run: rsync -avzrhcP -e "ssh -p ${{ secrets.SSH_PORT }}" ./node_modules ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/www/chainbox-frontend/
+
+      # - name: Restart Node Server
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USERNAME }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     port: ${{ secrets.SSH_PORT }}
+      #     script: |
+      #       sudo -u www pm2 restart frontend
