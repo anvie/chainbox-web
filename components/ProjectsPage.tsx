@@ -39,7 +39,7 @@ const ProjectsPage = () => {
         <div>Total {projects.length} project(s)</div>
         </div>
 
-        <div className="flex flex-wrap space-x-2 justify-center items-center pt-10">
+        <div className="flex flex-wrap justify-center items-center pt-10">
           {projects.map((project) => (
             <ProjectItem item={project} onClick={()=>{}} key={project._id}/>
           ))}

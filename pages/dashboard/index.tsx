@@ -176,7 +176,7 @@ const Home: NextPage = () => {
 
 
   return (
-    <div className={`${styles.container} pt-16 md:pt-0`}>
+    <div className={`pt-16 md:pt-0 items-center justify-center flex flex-col`}>
       <Head>
         <title>Chainbox</title>
         <meta
@@ -192,7 +192,7 @@ const Home: NextPage = () => {
 
       <div id="modal-root"></div>
 
-      <main className={`${styles.main} flex flex-col w-full items-center`}>
+      <main className={`flex flex-col w-2/3 justify-center items-center`}>
         {!networkSupported && (
           <div className="p-5 bg-orange-500 rounded-xl mb-10">
             Network not supported, please change to Ethereum mainnet
