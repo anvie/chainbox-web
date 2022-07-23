@@ -221,6 +221,7 @@ const Home: NextPage = () => {
               {!project.deployed && (
                 <div className="flex flex-col space-y-5">
                   <DeployBox
+                    project={project}
                     item={deployments.find(
                       (deployment) => deployment.network === "chainbox"
                     )}
@@ -230,6 +231,7 @@ const Home: NextPage = () => {
                     disabled={inDeploy}
                   />
                   <DeployBox
+                    project={project}
                     item={deployments.find(
                       (deployment) => deployment.network === "rinkeby"
                     )}
@@ -239,6 +241,7 @@ const Home: NextPage = () => {
                     disabled={inDeploy}
                   />
                   <DeployBox
+                    project={project}
                     item={deployments.find(
                       (deployment) => deployment.network === "mainnet"
                     )}
@@ -248,6 +251,7 @@ const Home: NextPage = () => {
                     disabled={inDeploy}
                   />
                   <DeployBox
+                    project={project}
                     item={deployments.find(
                       (deployment) => deployment.network === "polygon-main"
                     )}
@@ -272,25 +276,26 @@ export default Home;
 
 const explorerUrl = (network: string) => {
   if (network === "chainbox") {
-    return 'https://scan.chainbox.id';
-  }else if (network === "rinkeby") {
-    return 'https://rinkeby.etherscan.io';
-  }else if (network === "mainnet") {
-    return 'https://etherscan.io';
-  }else if (network === "polygon") {
-    return 'https://polygonscan.com'
-  }else if (network === "bsc") {
-    return 'https://bscscan.com'
-  }else{
-    return '???'
+    return "https://scan.chainbox.id";
+  } else if (network === "rinkeby") {
+    return "https://rinkeby.etherscan.io";
+  } else if (network === "mainnet") {
+    return "https://etherscan.io";
+  } else if (network === "polygon") {
+    return "https://polygonscan.com";
+  } else if (network === "bsc") {
+    return "https://bscscan.com";
+  } else {
+    return "???";
   }
-}
+};
 
 interface DeployBoxProps {
   item: any;
   network: string;
   networkId: string;
   disabled: boolean;
+  project: any;
   doDeploy: (network: string) => Promise<any>;
 }
 
@@ -300,6 +305,7 @@ const DeployBox: FC<DeployBoxProps> = ({
   network,
   networkId,
   disabled,
+  project,
 }) => {
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -325,16 +331,16 @@ const DeployBox: FC<DeployBoxProps> = ({
           <div>Contract address: {_item.contractAddress}</div>
           <div>
             TX:&nbsp;
-            <Link
-              href={`${explorerUrl(network)}/tx/${_item.txHash}`}
-            >
-              <a target="_balnk" className="link hover:text-blue-300">{shortenHash(_item.txHash)}</a>
+            <Link href={`${explorerUrl(network)}/tx/${_item.txHash}`}>
+              <a target="_balnk" className="link hover:text-blue-300">
+                {shortenHash(_item.txHash)}
+              </a>
             </Link>
           </div>
 
           <div>
             <Link
-              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${_item.abiFile}`}
+              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${_item.abiFile}`}
             >
               <a
                 className="p-2 link text-sm underline hover:text-blue-300"
