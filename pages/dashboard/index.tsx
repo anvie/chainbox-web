@@ -30,9 +30,8 @@ function isSupportedNetwork(chainId: number): boolean {
   }
   return (
     chainId === 1 || // Ethereum Mainnet
-    chainId === 4 // Rinkeby Mainnet
-  ); 
-  // || chainId === 1919; // Chainbox (testnet)
+    chainId === 4 || // Rinkeby Mainnet
+    chainId === 1919); // Chainbox (testnet)
 }
 
 const genMessageToSign = (address: string): string => {
