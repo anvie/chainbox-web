@@ -185,9 +185,9 @@ const Home: NextPage = () => {
                 <Button caption="Deploy" onClick={() => {}} />
               )}
               {/* <Button caption="Download ABI" onClick={downloadAbi} /> */}
-              <Link href={abiUrl()}>
+              { project.deployed && <Link href={abiUrl()}>
                 <a className="p-2 hover:underline" target="_blank">Download ABI</a>
-              </Link>
+              </Link> }
             </div>
           </div>
         )}
