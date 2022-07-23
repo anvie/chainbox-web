@@ -156,7 +156,7 @@ const Home: NextPage = () => {
   //   return "";
   // }, [project]);
 
-  const doDeploy = async (network: string): Promise<void> => {
+  const doDeploy = async (network: string): Promise<any> => {
     setInDeploy(true);
 
     return new Promise((resolve, reject) => {
@@ -176,7 +176,7 @@ const Home: NextPage = () => {
             resp
           );
           setInDeploy(false);
-          resolve();
+          resolve(resp.result);
         })
         .catch((err) => {
           console.log(
@@ -226,6 +226,7 @@ const Home: NextPage = () => {
                     )}
                     doDeploy={doDeploy}
                     network="chainbox"
+                    networkId="chainbox"
                     disabled={inDeploy}
                   />
                   <DeployBox
@@ -234,14 +235,25 @@ const Home: NextPage = () => {
                     )}
                     doDeploy={doDeploy}
                     network="rinkeby"
+                    networkId="rinkeby"
                     disabled={inDeploy}
                   />
                   <DeployBox
                     item={deployments.find(
-                      (deployment) => deployment.network === "rinkeby"
+                      (deployment) => deployment.network === "mainnet"
                     )}
                     doDeploy={doDeploy}
                     network="ethereum"
+                    networkId="mainnet"
+                    disabled={inDeploy}
+                  />
+                  <DeployBox
+                    item={deployments.find(
+                      (deployment) => deployment.network === "polygon-main"
+                    )}
+                    doDeploy={doDeploy}
+                    network="polygon"
+                    networkId="polygon-main"
                     disabled={inDeploy}
                   />
                 </div>
@@ -258,50 +270,104 @@ const Home: NextPage = () => {
 
 export default Home;
 
+const explorerUrl = (network: string) => {
+  if (network === "chainbox") {
+    return 'https://scan.chainbox.id';
+  }else if (network === "rinkeby") {
+    return 'https://rinkeby.etherscan.io';
+  }else if (network === "mainnet") {
+    return 'https://etherscan.io';
+  }else if (network === "polygon") {
+    return 'https://polygonscan.com'
+  }else if (network === "bsc") {
+    return 'https://bscscan.com'
+  }else{
+    return '???'
+  }
+}
+
 interface DeployBoxProps {
   item: any;
   network: string;
+  networkId: string;
   disabled: boolean;
-  doDeploy: (network: string) => Promise<void>;
+  doDeploy: (network: string) => Promise<any>;
 }
 
 const DeployBox: FC<DeployBoxProps> = ({
   item,
   doDeploy,
   network,
+  networkId,
   disabled,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [_item, setItem] = useState<any>(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setItem(item);
+      setLoaded(true);
+    }, 1000);
+  }, [item]);
+
+  // https://rinkeby.etherscan.io/tx/0x63f7b40138839499fe5c76fd1bae2d5ef2419faca3e1831ffd1bdf7773035c72
+
   const isDeployed = item != null;
   let _disabled = disabled || isDeployed;
   const _caption = isDeployed ? "Deployed" : "Deploy";
   return (
     <div className="border p-2 text-center w-96">
       <div className="mb-2">{toHeaderCase(network)}</div>
-      {item && (
+      {_item && (
         <div className="text-sm">
-          <div>Contract address: {item.contractAddress}</div>
-          <div>TX: {shortenHash(item.txHash)}</div>
+          <div>Contract address: {_item.contractAddress}</div>
+          <div>
+            TX:&nbsp;
+            <Link
+              href={`${explorerUrl(network)}/tx/${_item.txHash}`}
+            >
+              <a target="_balnk" className="link hover:text-blue-300">{shortenHash(_item.txHash)}</a>
+            </Link>
+          </div>
+
           <div>
             <Link
-              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${item.abiFile}`}
+              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${_item.abiFile}`}
             >
-              <a className="p-2 text-sm underline hover:text-blue-300" target="_blank">
+              <a
+                className="p-2 link text-sm underline hover:text-blue-300"
+                target="_blank"
+              >
                 Download ABI
               </a>
             </Link>
           </div>
         </div>
       )}
-      {!isDeployed && (
+      {!loaded && <Loading />}
+      {!isDeployed && !_item && (
         <SmallButton
           caption={_caption}
           color="bg-orange-600"
           onClick={() => {
+            if (_disabled) {
+              return;
+            }
             setLoading(true);
-            doDeploy(network).finally(() => {
-              setLoading(false);
-            });
+            doDeploy(networkId)
+              .then((result: any) => {
+                console.log(
+                  "🚀 ~ file: project.tsx ~ line 309 ~ doDeploy ~ result",
+                  result
+                );
+                // success
+                setItem(result);
+              })
+              .finally(() => {
+                setLoading(false);
+              });
           }}
           loading={loading}
           disabled={_disabled}

@@ -59,8 +59,8 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
           </svg>
         </button>
       </div>
-      <div className="w-full block lg:flex lg:items-center lg:w-auto">
-        <div className="text-sm flex-row lg:space-x-10">
+      <div className="w-full text-center items-center lg:w-auto">
+        <div className="text-sm flex lg:space-x-10">
           <Link href="/" passHref={true}>
             <div className="block mt-4 lg:inline-block lg:mt-0 mr-4 cursor-pointer font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-lg">
               Home
@@ -91,7 +91,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
                     <div
                       className={`${
                         isActive ? "underline" : ""
-                      } block mt-4 lg:inline-block lg:mt-0  mr-4 text-lg cursor-pointer`}
+                      } block mt-4 lg:inline-block lg:mt-0 mr-4 text-lg cursor-pointer`}
                     >
                       {label}
                     </div>
@@ -102,7 +102,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
 
           {currentAccount && (
             <Link href="/dashboard#profile" passHref={true}>
-              <div className="block mt-4 lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-sm">
+              <div className="block mt-5  lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-sm">
                 {shortenAddress(currentAccount)}
               </div>
             </Link>
@@ -110,7 +110,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
 
           {currentAccount && (
             <div
-              className={`block mt-2 lg:inline-block lg:mt-0 text-sm cursor-pointer`}
+              className={`block mt-5 items-center  ml-5 lg:inline-block lg:mt-0 text-sm cursor-pointer`}
               onClick={doLogout}
             >
               [logout]
