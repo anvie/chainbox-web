@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import AddProjectDialog from "./AddProjectDialog";
 import fw from "../lib/FetchWrapper";
 import ProjectItem, {ItemProps} from "./ProjectItem";
+import { userAccess } from "../lib/UserAccess";
 
 const ProjectsPage = () => {
   const [addProjectDialogVisible, setAddProjectDialogVisible] = useState(false);
@@ -25,6 +26,16 @@ const ProjectsPage = () => {
 
   useEffect(() => {
     fetchProjects();
+
+    const subs = userAccess.access?.subscribe((access: any) => {
+      if (access){
+        fetchProjects();
+      }
+    })
+
+    return () => {
+      subs?.unsubscribe();
+    };
   }, []);
 
   return (

@@ -34,7 +34,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
     });
 
     return () => {
-      subs.unsubscribe();
+      subs?.unsubscribe();
     };
   }, []);
 
