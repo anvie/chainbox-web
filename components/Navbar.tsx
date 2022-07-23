@@ -1,24 +1,49 @@
 import styles from "../styles/Home.module.sass";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FC } from "react";
-import { UserContext } from "../lib/UserContext";
+import { FC, useEffect, useState } from "react";
+import { userAccess } from "../lib/UserAccess";
+import { shortenAddress } from "../lib/Utils";
 
 type LinksType = Array<{ href: string; label: string; onClick?: () => void }>;
 
 const DEFAULT_LINKS: LinksType = [
-  { href: "/#about", label: "About" },
-  { href: "/#faq", label: "FAQ" },
 ];
 
 interface Props {
   links?: LinksType;
+  noDasboard?: boolean;
 }
 
-const Navbar: FC<Props> = ({ links }) => {
+const Navbar: FC<Props> = ({ links, noDasboard }) => {
   const router = useRouter();
 
+  const [currentAccount, setCurrentAccount] = useState<string | null>(null);
+
   const _links: LinksType = links || DEFAULT_LINKS;
+
+  useEffect(() => {
+    const subs = userAccess.access?.subscribe((access: any) => {
+      console.log(
+        "🚀 ~ file: Navbar.tsx ~ line 31 ~ userAccess.access.subscribe ~ access",
+        access
+      );
+      if (access) {
+        setCurrentAccount(access.ethAddress);
+      }
+    });
+
+    return () => {
+      subs.unsubscribe();
+    };
+  }, []);
+
+  const doLogout = () => {
+    userAccess.logout();
+    setTimeout(() => {
+      router.reload();
+    }, 500);
+  };
 
   return (
     <nav className={`items-center justify-center flex-wrap p-6 hidden md:flex`}>
@@ -75,8 +100,25 @@ const Navbar: FC<Props> = ({ links }) => {
               }
             })}
 
-          {router.pathname !== "/dashboard" &&
-          !router.pathname.startsWith("/cp") ? (
+          {currentAccount && (
+            <Link href="/dashboard#profile" passHref={true}>
+              <div className="block mt-4 lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-sm">
+                {shortenAddress(currentAccount)}
+              </div>
+            </Link>
+          )}
+
+          {currentAccount && (
+            <div
+              className={`block mt-2 lg:inline-block lg:mt-0 text-sm cursor-pointer`}
+              onClick={doLogout}
+            >
+              [logout]
+            </div>
+          )}
+
+          {(!noDasboard && router.pathname !== "/dashboard" &&
+          !router.pathname.startsWith("/cp")) ? (
             <Link href="/dashboard" passHref={true}>
               <div className="block mt-4 lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-lg">
                 Dashboard
@@ -90,4 +132,3 @@ const Navbar: FC<Props> = ({ links }) => {
 };
 
 export default Navbar;
-

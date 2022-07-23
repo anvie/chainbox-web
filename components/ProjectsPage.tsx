@@ -18,6 +18,8 @@ const ProjectsPage = () => {
     fw.get("/v1/projects").then(({ result }) => {
       console.log("🚀 ~ file: ProjectsPage.tsx ~ line 49 ~ fetchProjects ~ result", result);
       setProjects(result);
+    }).catch((err:any) => {
+      console.log("[ERROR]", err)
     })
   }
 

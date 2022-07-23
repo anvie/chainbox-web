@@ -17,7 +17,8 @@ const nextConfig = {
     jwtSecret: process.env.JWT_SECRET
   },
   env: {
-    API_BASE_URL: process.env.API_BASE_URL
+    API_BASE_URL: process.env.API_BASE_URL,
+    BASE_URL_PROJECT_DATA_DIR: process.env.BASE_URL_PROJECT_DATA_DIR,
   }
 };
 

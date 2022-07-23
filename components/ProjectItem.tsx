@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from "react";
 import Button from "./Button";
 import SmallButton from "./SmallButton";
 import fw from "../lib/FetchWrapper";
+import { useRouter } from "next/router";
 
 export interface ItemProps {
   name: string;
@@ -22,6 +23,7 @@ interface ProjectItemProps {
 }
 
 const ProjectItem: FC<ProjectItemProps> = ({ onClick, item }) => {
+  const router = useRouter();
   const [inDeploy, setInDeploy] = useState(false);
 
   const doDeploy = () => {
@@ -60,12 +62,11 @@ const ProjectItem: FC<ProjectItemProps> = ({ onClick, item }) => {
         </div>
 
         <SmallButton
-          caption="DEPLOY"
-          onClick={doDeploy}
+          caption="DETAIL"
+          onClick={()=> router.push(`/dashboard/project#${item._id}`)}
           color="bg-blue-200"
           textColor="text-gray-500"
           className="mt-2"
-          loading={inDeploy}
         />
       </div>
     </div>

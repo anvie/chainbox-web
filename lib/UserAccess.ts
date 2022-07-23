@@ -2,7 +2,7 @@ import { BehaviorSubject } from "rxjs";
 import Router from "next/router";
 
 const accessSubject = new BehaviorSubject(
-  process.browser && JSON.parse(localStorage.getItem("user_access") as string)
+  typeof window !== "undefined" && JSON.parse(localStorage.getItem("user_access") as string)
 );
 
 export const userAccess = {

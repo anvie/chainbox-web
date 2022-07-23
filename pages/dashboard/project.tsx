@@ -13,42 +13,22 @@ import { AbiItem } from "web3-utils";
 import { ethRpcError } from "../../lib/ErrorHandler";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { Loading } from "../../components/Loading";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import fw from "../../lib/FetchWrapper";
 import { userAccess } from "../../lib/UserAccess";
 import { shortenAddress } from "../../lib/Utils";
 import ProjectsPage from "../../components/ProjectsPage";
-import ProfilePage from "../../components/ProfilePage";
-// import { UserContext } from "../../lib/UserContext";
-
-const messageFormat =
-  "Please sign this message to ensure you have right access to your wallet.";
-
-function isSupportedNetwork(chainId: number): boolean {
-  if (process.env.NODE_ENV === "development") {
-    return true;
-  }
-  return (
-    chainId === 1 || // Ethereum Mainnet
-    chainId === 4 // Rinkeby Mainnet
-  ); 
-  // || chainId === 1919; // Chainbox (testnet)
-}
-
-const genMessageToSign = (address: string): string => {
-  const nonce = Math.floor(new Date().getTime() / (60 * 1000));
-  return messageFormat + "\n\naddress: " + address + "\n\nnonce: " + nonce;
-};
+import Button from "../../components/Button";
+import Link from "next/link";
+import { toPascalCase } from "js-convert-case";
 
 const Home: NextPage = () => {
   const router = useRouter();
 
   const [currentAccount, setCurrentAccount] = useState<string | null>(null);
-  const [web3, setWeb3] = useState<Web3 | null>(null);
-  const [errorInfo, setErrorInfo] = useState<string | null>(null);
-  const [networkSupported, setNetworkSupported] = useState(true);
-  const [noMetamask, setNoMetamask] = useState(false);
-  const [page, setPage] = useState(0);
+  const [project, setProject] = useState<any | null>(null);
+
+  const links = [{ href: "/dashboard#projects", label: "Projects" }];
 
   const onAccountsChanged = (accs: any) => {
     console.log("onAccountsChanged", accs);
@@ -78,7 +58,7 @@ const Home: NextPage = () => {
       return;
     }
     console.log("onNetworkChanged", chainId);
-    setNetworkSupported(isSupportedNetwork(chainId));
+    // setNetworkSupported(isSupportedNetwork(chainId));
   };
 
   useEffect(() => {
@@ -104,52 +84,35 @@ const Home: NextPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    async function fetchData() {
-      console.log("detectEthereumProvider...");
-      try {
-        const provider: any = await detectEthereumProvider();
-        if (!provider) {
-          setErrorInfo(
-            "You have no Metamask installed, please install Metamask first"
-          );
-          setNoMetamask(true);
-          return;
-        }
-        console.log(
-          "🚀 ~ file: index.tsx ~ line 142 ~ fetchData ~ provider",
-          provider
-        );
-        const _web3 = new Web3(provider);
-        setWeb3(_web3);
-        console.log("web3 loaded");
-      } catch (err) {
-        console.log("web3 not loaded");
-        console.log("ERROR:", err);
-        setErrorInfo("Cannot load Web3");
+  const fetchProject = async () => {
+    console.log("in fetchProject");
+    if (currentAccount) {
+      const path = router.asPath.trim();
+      const projectId = path.split("#")[1];
+      console.log(
+        "🚀 ~ file: project.tsx ~ line 89 ~ fetchProject ~ projectId",
+        projectId
+      );
+      if (projectId) {
+        fw.get(`/v1/project/${projectId}`)
+          .then((res: any) => {
+            if (res.result) {
+              setProject(res.result);
+            }
+          })
+          .catch((err: any) => {
+            console.error("[ERROR]", err);
+          });
       }
     }
-    fetchData();
-  }, []);
-
-  const links = [{ href: "/dashboard#projects", label: "Projects" }];
-
-  // if (currentAccount){
-  //   links.push({ href: "/dashboard#profile", label: `Connected: ${shortenAddress(currentAccount)}` });
-  // }
+  };
 
   useEffect(() => {
     if (currentAccount) {
-      const path = router.asPath.trim();
-      console.log(path);
-      if (path.match(/#projects$/gi)) {
-        setPage(0);
-      }
-      if (path.match(/#profile$/gi)) {
-        setPage(1);
-      }
+      fetchProject();
     }
-  }, [router, currentAccount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentAccount]);
 
   const setAccount = async (acc: string | null) => {
     if (acc === null) {
@@ -157,27 +120,39 @@ const Home: NextPage = () => {
     }
     setCurrentAccount(acc);
 
-    // get token
+    // // get token
+    // const message = genMessageToSign(acc);
+    // const signature = await web3!.eth.personal.sign(message, acc, "")
 
-    if (web3) {
-      const message = genMessageToSign(acc);
-      const signature = await web3.eth.personal.sign(message, acc, "");
-
-      fw.post("/v1/authenticate", {
-        address: acc,
-        signature,
-      }).then(({ error, result }) => {
-        if (error) {
-          console.log("error", error);
-          setErrorInfo(error.message);
-        }
-        userAccess.authenticate(acc!, result.token);
-      });
-    }
+    // fw.post("/v1/authenticate", {
+    //   address: acc,
+    //   signature
+    // }).then(({error, result}) => {
+    //   if (error) {
+    //     console.log("error", error);
+    //     setErrorInfo(error.message);
+    //   }
+    //   userAccess.authenticate(acc!, result.token);
+    // })
   };
 
+  const downloadAbi = useCallback(async () => {
+    if (currentAccount && project) {
+      // Router.push(`/project/${project.id}/abi`);
+    }
+  }, [currentAccount, project]);
+
+  const abiUrl = useCallback(() => {
+    if (project) {
+      return `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${toPascalCase(project.meta.generated)}-${
+        project._id
+      }-ABI.json`;
+    }
+    return "";
+  }, [project]);
+
   return (
-    <div className={`pt-16 md:pt-0 items-center justify-center flex flex-col`}>
+    <div className={`pt-16 md:pt-0 flex flex-col`}>
       <Head>
         <title>Chainbox</title>
         <meta
@@ -189,43 +164,33 @@ const Home: NextPage = () => {
 
       <div className="blur-dot-yellow" />
 
-      <Navbar links={links} noDasboard={currentAccount != null} />
+      <Navbar links={links} noDasboard={true} />
 
       <div id="modal-root"></div>
 
       <main className={`flex flex-col w-2/3 justify-center items-center`}>
-        {!networkSupported && (
-          <div className="p-5 bg-orange-500 rounded-xl mb-10">
-            Network not supported, please change to Ethereum mainnet
-          </div>
-        )}
-
-        {errorInfo && (
-          <div className="p-5 bg-red-500 rounded-xl mb-10">
-            ERROR: {errorInfo}
-          </div>
-        )}
-
-        {/* {!currentAccount && <Loading className="p-10" />} */}
-
-        {!noMetamask && (
+        {project && (
           <div>
-            <ConnectButton
-              setAccount={setAccount}
-              noConnectedInfo={true}
-              currentAddress={currentAccount}
-              onError={(err) => {
-                setErrorInfo(
-                  "No Metamask detected, make sure you have Metamask installed on your browser"
-                );
-                setNoMetamask(true);
-              }}
-            />
+            <h1>Project: {project.name}</h1>
+            <div className="mt-5">
+              <p>{project.description}</p>
+
+              <div>Status: {project.deployed ? "DEPLOYED" : "DRAFT"}</div>
+              <div>Capped: {project.meta.capped.toString()}</div>
+              <div>Max supply: {project.meta.maxSupply.toString()}</div>
+              <div>ID: {project._id}</div>
+            </div>
+            <div className="mt-10 flex flex-row space-x-5">
+              {!project.deployed && (
+                <Button caption="Deploy" onClick={() => {}} />
+              )}
+              {/* <Button caption="Download ABI" onClick={downloadAbi} /> */}
+              <Link href={abiUrl()}>
+                <a className="p-2 hover:underline" target="_blank">Download ABI</a>
+              </Link>
+            </div>
           </div>
         )}
-
-        {page == 0 && currentAccount && <ProjectsPage />}
-        {page == 1 && currentAccount && <ProfilePage />}
       </main>
 
       <Footer />
