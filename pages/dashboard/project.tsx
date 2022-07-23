@@ -328,7 +328,11 @@ const DeployBox: FC<DeployBoxProps> = ({
       <div className="mb-2">{toHeaderCase(network)}</div>
       {_item && (
         <div className="text-sm">
-          <div>Contract address: {_item.contractAddress}</div>
+          <div>Contract address: 
+            <Link href={`${explorerUrl(network)}/address/${_item.contractAddress}`}>
+            <a target="_blank" className="link hover:text-blue-300">{_item.contractAddress}</a>
+            </Link>
+          </div>
           <div>
             TX:&nbsp;
             <Link href={`${explorerUrl(network)}/tx/${_item.txHash}`}>
