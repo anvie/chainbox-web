@@ -29,6 +29,7 @@ function isSupportedNetwork(chainId: number): boolean {
   }
   return chainId === 1 // Ethereum Mainnet 
     || chainId === 4; // Rinkeby Mainnet
+    // || chainId === 1919; // Chainbox (testnet)
 }
 
 const genMessageToSign = (address: string): string => {
@@ -181,7 +182,7 @@ const Home: NextPage = () => {
         <title>Chainbox</title>
         <meta
           name="description"
-          content="Chainbox is a collection of 1000 digital collectible items with exclusive benefits"
+          content="Chainbox is a tool to simplify the process of creating a Web3 project"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>

@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer className={styles.footer}>
       <div className="flex flex-col place-items-center items-center justify-center pt-10">
-        <Image
+        {/* <Image
           src="Chainbox-logo.png"
           alt="Chainbox Logo"
           width={300}
@@ -23,7 +23,7 @@ const Footer = () => {
             height={60}
             loader={imageLoader}
           />
-        </div>
+        </div> */}
 
         <div className="pt-10 pb-10 text-center">
           Copyright &copy; 2022 Chainbox. All rights reserved.
