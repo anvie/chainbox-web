@@ -4,6 +4,9 @@
 export const shortenAddress = (address: string) => {
   return address.substring(0, 6) + "..." + address.substring(38);
 }
+export const shortenHash = (hash: string) => {
+  return hash.substring(0, 6) + "..." + hash.substring(60);
+}
 
 
 export const formatError = (error: any):string => {

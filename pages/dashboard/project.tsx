@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../../styles/Home.module.sass";
 import Navbar from "../../components/Navbar";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import EligibilityChecker from "../../components/EligibilityChecker";
 import ConnectButton from "../../components/ConnectButton";
@@ -16,17 +16,21 @@ import { Loading } from "../../components/Loading";
 import { Router, useRouter } from "next/router";
 import fw from "../../lib/FetchWrapper";
 import { userAccess } from "../../lib/UserAccess";
-import { shortenAddress } from "../../lib/Utils";
+import { shortenAddress, shortenHash } from "../../lib/Utils";
 import ProjectsPage from "../../components/ProjectsPage";
 import Button from "../../components/Button";
 import Link from "next/link";
-import { toPascalCase } from "js-convert-case";
+import { toPascalCase, toHeaderCase } from "js-convert-case";
+import { formatError } from "../../lib/Utils";
+import SmallButton from "../../components/SmallButton";
 
 const Home: NextPage = () => {
   const router = useRouter();
 
   const [currentAccount, setCurrentAccount] = useState<string | null>(null);
   const [project, setProject] = useState<any | null>(null);
+  const [deployments, setDeployments] = useState<any[]>([]);
+  const [inDeploy, setInDeploy] = useState(false);
 
   const links = [{ href: "/dashboard#projects", label: "Projects" }];
 
@@ -97,7 +101,8 @@ const Home: NextPage = () => {
         fw.get(`/v1/project/${projectId}`)
           .then((res: any) => {
             if (res.result) {
-              setProject(res.result);
+              setProject(res.result.project);
+              setDeployments(res.result.deployments);
             }
           })
           .catch((err: any) => {
@@ -136,23 +141,55 @@ const Home: NextPage = () => {
     // })
   };
 
-  const downloadAbi = useCallback(async () => {
-    if (currentAccount && project) {
-      // Router.push(`/project/${project.id}/abi`);
-    }
-  }, [currentAccount, project]);
+  // const downloadAbi = useCallback(async () => {
+  //   if (currentAccount && project) {
+  //     // Router.push(`/project/${project.id}/abi`);
+  //   }
+  // }, [currentAccount, project]);
 
-  const abiUrl = useCallback(() => {
-    if (project) {
-      return `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${toPascalCase(project.meta.generated)}-${
-        project._id
-      }-ABI.json`;
-    }
-    return "";
-  }, [project]);
+  // const abiUrl = useCallback(() => {
+  //   if (project) {
+  //     return `${process.env.BASE_URL_PROJECT_DATA_DIR}/${
+  //       project.meta.generated
+  //     }/${toPascalCase(project.meta.generated)}-${project._id}-ABI.json`;
+  //   }
+  //   return "";
+  // }, [project]);
+
+  const doDeploy = async (network: string): Promise<void> => {
+    setInDeploy(true);
+
+    return new Promise((resolve, reject) => {
+      fw.post(`/v1/deploy`, {
+        projectId: project._id,
+        network: network.toLowerCase(),
+      })
+        .then((resp) => {
+          if (resp.error || resp.errors) {
+            console.error("[ERROR]", resp.error || resp.errors);
+            alert(formatError(resp.error || resp.errors));
+            setInDeploy(false);
+            reject(resp.error || resp.errors);
+          }
+          console.log(
+            "🚀 ~ file: ProjectItem.tsx ~ line 32 ~ fw.post ~ resp",
+            resp
+          );
+          setInDeploy(false);
+          resolve();
+        })
+        .catch((err) => {
+          console.log(
+            "🚀 ~ file: ProjectItem.tsx ~ line 57 ~ doDeploy ~ err",
+            err
+          );
+          reject(err);
+        });
+    });
+  };
 
   return (
-    <div className={`pt-16 md:pt-0 flex flex-col`}>
+    <div className={`pt-16 md:pt-0 flex flex-col items-center`}>
       <Head>
         <title>Chainbox</title>
         <meta
@@ -180,14 +217,35 @@ const Home: NextPage = () => {
               <div>Max supply: {project.meta.maxSupply.toString()}</div>
               <div>ID: {project._id}</div>
             </div>
-            <div className="mt-10 flex flex-row space-x-5">
+            <div className="mt-10">
               {!project.deployed && (
-                <Button caption="Deploy" onClick={() => {}} />
+                <div className="flex flex-col space-y-5">
+                  <DeployBox
+                    item={deployments.find(
+                      (deployment) => deployment.network === "chainbox"
+                    )}
+                    doDeploy={doDeploy}
+                    network="chainbox"
+                    disabled={inDeploy}
+                  />
+                  <DeployBox
+                    item={deployments.find(
+                      (deployment) => deployment.network === "rinkeby"
+                    )}
+                    doDeploy={doDeploy}
+                    network="rinkeby"
+                    disabled={inDeploy}
+                  />
+                  <DeployBox
+                    item={deployments.find(
+                      (deployment) => deployment.network === "rinkeby"
+                    )}
+                    doDeploy={doDeploy}
+                    network="ethereum"
+                    disabled={inDeploy}
+                  />
+                </div>
               )}
-              {/* <Button caption="Download ABI" onClick={downloadAbi} /> */}
-              { project.deployed && <Link href={abiUrl()}>
-                <a className="p-2 hover:underline" target="_blank">Download ABI</a>
-              </Link> }
             </div>
           </div>
         )}
@@ -199,6 +257,59 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+interface DeployBoxProps {
+  item: any;
+  network: string;
+  disabled: boolean;
+  doDeploy: (network: string) => Promise<void>;
+}
+
+const DeployBox: FC<DeployBoxProps> = ({
+  item,
+  doDeploy,
+  network,
+  disabled,
+}) => {
+  const [loading, setLoading] = useState(false);
+  const isDeployed = item != null;
+  let _disabled = disabled || isDeployed;
+  const _caption = isDeployed ? "Deployed" : "Deploy";
+  return (
+    <div className="border p-2 text-center w-96">
+      <div className="mb-2">{toHeaderCase(network)}</div>
+      {item && (
+        <div className="text-sm">
+          <div>Contract address: {item.contractAddress}</div>
+          <div>TX: {shortenHash(item.txHash)}</div>
+          <div>
+            <Link
+              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${item.abiFile}`}
+            >
+              <a className="p-2 text-sm underline hover:text-blue-300" target="_blank">
+                Download ABI
+              </a>
+            </Link>
+          </div>
+        </div>
+      )}
+      {!isDeployed && (
+        <SmallButton
+          caption={_caption}
+          color="bg-orange-600"
+          onClick={() => {
+            setLoading(true);
+            doDeploy(network).finally(() => {
+              setLoading(false);
+            });
+          }}
+          loading={loading}
+          disabled={_disabled}
+        />
+      )}
+    </div>
+  );
+};
 
 function watchTransaction(web3: Web3, txHash: any): Promise<any> {
   console.log("🚀 tx.hash", txHash);

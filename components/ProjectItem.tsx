@@ -24,26 +24,7 @@ interface ProjectItemProps {
 
 const ProjectItem: FC<ProjectItemProps> = ({ onClick, item }) => {
   const router = useRouter();
-  const [inDeploy, setInDeploy] = useState(false);
-
-  const doDeploy = () => {
-    setInDeploy(true);
-
-    fw.post(`/v1/deploy`, { projectId: item._id })
-      .then((resp) => {
-        console.log(
-          "🚀 ~ file: ProjectItem.tsx ~ line 32 ~ fw.post ~ resp",
-          resp
-        );
-        setInDeploy(false);
-      })
-      .catch((err) => {
-        console.log(
-          "🚀 ~ file: ProjectItem.tsx ~ line 57 ~ doDeploy ~ err",
-          err
-        );
-      });
-  };
+  
 
   return item ? (
     <div className="flex mt-2 mr-2 flex-col justify-right bg-slate-200 text-gray-600 shadow-md w-60">

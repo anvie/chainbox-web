@@ -1,13 +1,15 @@
 import { FC, useEffect, useState } from "react";
+import { Loading } from "./Loading";
 
 interface Props {
   caption: string;
   color?: string;
   textColor?: string;
+  loading?: boolean;
   onClick?: (event: any) => void;
 }
 
-const Button: FC<Props> = ({ caption, color, textColor, onClick }) => {
+const Button: FC<Props> = ({ caption, color, textColor, loading, onClick }) => {
   const buttonStyle = {
     minWidth: '100px'
   }
@@ -18,7 +20,8 @@ const Button: FC<Props> = ({ caption, color, textColor, onClick }) => {
       style={buttonStyle}
       onClick={(event) => onClick && onClick(event)}
     >
-      {caption}
+      {!loading && <div>{caption}</div>}
+      {loading && <Loading className="loading" />}
     </div>
   );
 };
