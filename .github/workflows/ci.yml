@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      BASE_URL_PROJECT_DATA_DIR: ${{ secrets.BASE_URL_PROJECT_DATA_DIR }}
     steps:
       - uses: actions/checkout@v2
 
