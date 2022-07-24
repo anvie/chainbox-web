@@ -1,30 +1,31 @@
 import type { NextPage } from "next";
 // import useSWR from "swr";
 import Head from "next/head";
-import styles from "../../styles/Home.module.sass";
 import Navbar from "../../components/Navbar";
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
-import EligibilityChecker from "../../components/EligibilityChecker";
-import ConnectButton from "../../components/ConnectButton";
 import Web3 from "web3";
 import { Contract } from "web3-eth-contract";
 import { AbiItem } from "web3-utils";
-import { ethRpcError } from "../../lib/ErrorHandler";
 import detectEthereumProvider from "@metamask/detect-provider";
-import { Loading } from "../../components/Loading";
-import { Router, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import fw from "../../lib/FetchWrapper";
 import { userAccess } from "../../lib/UserAccess";
-import { shortenAddress, shortenHash } from "../../lib/Utils";
-import ProjectsPage from "../../components/ProjectsPage";
-import Button from "../../components/Button";
-import Link from "next/link";
-import { toPascalCase, toHeaderCase } from "js-convert-case";
-import { formatError } from "../../lib/Utils";
-import SmallButton from "../../components/SmallButton";
+import { toHeaderCase } from "js-convert-case";
 import DeployBox from "../../components/DeployBox";
-import contractAbi from "../../lib/ChainboxProxy-ABI.json";
+import contractAbiChainbox from "../../lib/ChainboxProxy-abi-chainbox.json";
+import contractAbiRinkeby from "../../lib/ChainboxProxy-abi-rinkeby.json";
+import contractAbiPolygon from "../../lib/ChainboxProxy-abi-polygon.json";
+import { isNetworkSupported } from "../../lib/chainutils";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
+
+const CONTRACT_ABIS: any = {
+  chainbox: contractAbiChainbox,
+  rinkeby: contractAbiRinkeby,
+  polygon: contractAbiPolygon
+};
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -40,6 +41,7 @@ const Home: NextPage = () => {
   const [networkSupported, setNetworkSupported] = useState(true);
   const [contract, setContract] = useState<Contract | null>(null);
   const [contractLoaded, setContractLoaded] = useState(false);
+  const [networkId, setNetworkId] = useState<string | null>(null);
 
   const links = [{ href: "/dashboard#projects", label: "Projects" }];
 
@@ -71,7 +73,19 @@ const Home: NextPage = () => {
       return;
     }
     console.log("onNetworkChanged", chainId);
-    // setNetworkSupported(isSupportedNetwork(chainId));
+    switch (chainId) {
+      case 1919:
+        setNetworkId("chainbox");
+        return;
+      case 4:
+        setNetworkId("rinkeby");
+        return;
+      case 137:
+        setNetworkId("polygon");
+        return;
+      default:
+        setNetworkSupported(isNetworkSupported(chainId));
+    }
   };
 
   useEffect(() => {
@@ -179,22 +193,32 @@ const Home: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    if (web3 && networkSupported) {
-      const contractAddress = process.env.CHAINBOX_PROXY_CONTRACT;
-      if (!contractAddress) {
-        throw Error("CHAINBOX_PROXY_CONTRACT is not defined");
-      }
+    if (web3 && networkSupported && networkId) {
+      // const contractAddress = process.env.CHAINBOX_PROXY_CONTRACT;
+      // if (!contractAddress) {
+      //   throw Error("CHAINBOX_PROXY_CONTRACT is not defined");
+      // }
+      const contractAddress =
+        publicRuntimeConfig.proxyContractAddresses[networkId];
       console.log("SC address:", contractAddress);
+
+      if (contractAddress === "0x0000000000000000000000000000000000000000") {
+        console.log(
+          "[WARN] Contract address is not defined for network " + networkId
+        );
+        return;
+      }
+
       setContract(
         new web3.eth.Contract(
-          contractAbi.abi as unknown as AbiItem,
+          CONTRACT_ABIS[networkId].abi as unknown as AbiItem,
           contractAddress
         )
       );
       console.log("contract loaded");
       setContractLoaded(true);
     }
-  }, [web3, networkSupported]);
+  }, [web3, networkSupported, networkId]);
 
   // const doDeploy = async (network: string): Promise<any> => {
   //   setInDeploy(true);
@@ -258,7 +282,14 @@ const Home: NextPage = () => {
               <div>ID: {project._id}</div>
             </div>
             <div className="mt-10">
-              {(!project.deployed && web3 && contract) && (
+              <div className="mb-5">
+                Current connected network:{" "}
+                <span className="font-semibold text-green-500">
+                  {toHeaderCase(networkId || "Unknown")}
+                </span>
+                <span className="ml-2 text-sm">[{networkId && contract && publicRuntimeConfig.proxyContractAddresses && publicRuntimeConfig.proxyContractAddresses[networkId] }]</span>
+              </div>
+              {!project.deployed && web3 && contract && (
                 <div className="flex flex-col space-y-5">
                   <DeployBox
                     project={project}

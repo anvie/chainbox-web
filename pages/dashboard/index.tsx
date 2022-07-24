@@ -20,19 +20,10 @@ import { shortenAddress } from "../../lib/Utils";
 import ProjectsPage from "../../components/ProjectsPage";
 import ProfilePage from "../../components/ProfilePage";
 // import { UserContext } from "../../lib/UserContext";
+import { isNetworkSupported } from "../../lib/chainutils";
 
 const messageFormat =
   "Please sign this message to ensure you have right access to your wallet.";
-
-function isSupportedNetwork(chainId: number): boolean {
-  if (process.env.NODE_ENV === "development") {
-    return true;
-  }
-  return (
-    chainId === 1 || // Ethereum Mainnet
-    chainId === 4 || // Rinkeby Mainnet
-    chainId === 1919); // Chainbox (testnet)
-}
 
 const genMessageToSign = (address: string): string => {
   const nonce = Math.floor(new Date().getTime() / (60 * 1000));
@@ -77,7 +68,7 @@ const Home: NextPage = () => {
       return;
     }
     console.log("onNetworkChanged", chainId);
-    setNetworkSupported(isSupportedNetwork(chainId));
+    setNetworkSupported(isNetworkSupported(chainId));
   };
 
   useEffect(() => {

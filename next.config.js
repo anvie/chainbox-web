@@ -16,11 +16,21 @@ const nextConfig = {
   serverRuntimeConfig: {
     jwtSecret: process.env.JWT_SECRET
   },
+  publicRuntimeConfig: {
+    proxyContractAddresses: {
+      'chainbox': '0x7c7Ed36F163B3CD38d32e608A7A1429479933EA0',
+      'rinkeby': '0x757b3F16eF32D97fDEea8bA442823eD4c76926A6',
+      'mainnet': '0x0000000000000000000000000000000000000000',
+      'polygon': '0x757b3F16eF32D97fDEea8bA442823eD4c76926A6',
+      'bsc': '0x0000000000000000000000000000000000000000',
+    }
+  },
   env: {
     API_BASE_URL: process.env.API_BASE_URL,
     BASE_URL_PROJECT_DATA_DIR: process.env.BASE_URL_PROJECT_DATA_DIR,
     CHAINBOX_PROXY_CONTRACT: process.env.CHAINBOX_PROXY_CONTRACT,
-  }
+  },
+  
 };
 
 module.exports = nextConfig;

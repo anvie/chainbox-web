@@ -87,7 +87,6 @@ const DeployBox: FC<DeployBoxProps> = ({
   
 
   const _doDeploy = async (network: string): Promise<any> => {
-    // setInDeploy(true);
     if (isDisabled) {
       return;
     }

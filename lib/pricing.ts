@@ -1,6 +1,7 @@
 
 import Web3 from "web3";
 
+// Settings your pricing for each network here:
 export function getPrice(networkId: string): string{
   switch (networkId) {
     case "chainbox":

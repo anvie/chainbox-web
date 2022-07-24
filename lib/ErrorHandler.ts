@@ -34,6 +34,9 @@ export function ethRpcError(error: any) {
       return "Transaction aborted";
     }
     default:
+      if (error.message){
+        return error.message;
+      }
       return "Unknown error";
   }
 }
