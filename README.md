@@ -1,6 +1,7 @@
 # Chainbox
 
-Simplified Web3 Generator
+Simplified Web3 Generator. Let you build Web3 project in matter of seconds, from creating smart contract, deploying into blockchain,
+and integrate with the web frontend!
 
 ## Getting Started
 
