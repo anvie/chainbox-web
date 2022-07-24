@@ -54,26 +54,46 @@ const DeployBox: FC<DeployBoxProps> = ({
   const [loaded, setLoaded] = useState(false);
   const [_item, setItem] = useState<any>(null);
   const [errorInfo, setErrorInfo] = useState<string | null>(null);
+  const [inDeployment, setInDeployment] = useState(false);
+  const [caption, setCaption] = useState("Deploy");
+  const [isDisabled, setIsDisabled] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
       setItem(item);
+      setInDeployment((project.meta.deployment && project.meta.deployment[networkId]?.status === 'in progress'));
       setLoaded(true);
     }, 1000);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item]);
 
 
   const isDeployed = item != null;
-  let _disabled = disabled || isDeployed;
-  const _caption = isDeployed ? "Deployed" : "Deploy";
+  // let _disabled = disabled || isDeployed;
+
+  // let _caption = isDeployed ? "Deployed" : "Deploy";
+
+  useEffect(() => {
+    if (inDeployment){
+      // _disabled = true;
+      setCaption("deploying...");
+      setIsDisabled(true);
+    }else{
+      // _disabled = false;
+      setCaption("Deploy");
+      setIsDisabled(false);
+    }
+  }, [inDeployment])
+  
 
   const _doDeploy = async (network: string): Promise<any> => {
     // setInDeploy(true);
-    if (_disabled) {
+    if (isDisabled) {
       return;
     }
 
     setLoading(true);
+    setInDeployment(true);
     setErrorInfo(null);
 
     const {ethAddress} = userAccess.accessValue
@@ -84,7 +104,7 @@ const DeployBox: FC<DeployBoxProps> = ({
       console.log("price:", price);
       const sendData: any = {
         from: ethAddress,
-        value: web3.utils.toBN(price),
+        value: price,
         gasLimit: web3.utils.toHex(610000),
         nonce: web3.utils.toHex(
           await web3.eth.getTransactionCount(ethAddress, "pending")
@@ -114,6 +134,7 @@ const DeployBox: FC<DeployBoxProps> = ({
         .catch((err: any) => {
           setErrorInfo(ethRpcError(err));
           setTimeout(() => setErrorInfo(null), 2000);
+          setInDeployment(false);
           // alert(ethRpcError(err))
         })
         .finally(() => {
@@ -187,13 +208,13 @@ const DeployBox: FC<DeployBoxProps> = ({
       )}
       {errorInfo && (<div className="p-2 bg-red-500 text-white mb-2">{errorInfo}</div>)}
       {!loaded && <Loading />}
-      {!isDeployed && !_item && (
+      {(!isDeployed && !_item) && (
         <SmallButton
-          caption={_caption}
+          caption={caption}
           color="bg-orange-600"
           onClick={_doDeploy}
           loading={loading}
-          disabled={_disabled}
+          disabled={isDisabled}
         />
       )}
     </div>
