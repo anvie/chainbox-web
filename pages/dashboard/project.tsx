@@ -23,6 +23,8 @@ import Link from "next/link";
 import { toPascalCase, toHeaderCase } from "js-convert-case";
 import { formatError } from "../../lib/Utils";
 import SmallButton from "../../components/SmallButton";
+import DeployBox from "../../components/DeployBox";
+import contractAbi from "../../lib/ChainboxProxy-ABI.json";
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -31,6 +33,13 @@ const Home: NextPage = () => {
   const [project, setProject] = useState<any | null>(null);
   const [deployments, setDeployments] = useState<any[]>([]);
   const [inDeploy, setInDeploy] = useState(false);
+  const [errorInfo, setErrorInfo] = useState<string | null>(null);
+  const [noMetamask, setNoMetamask] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [web3, setWeb3] = useState<Web3 | null>(null);
+  const [networkSupported, setNetworkSupported] = useState(true);
+  const [contract, setContract] = useState<Contract | null>(null);
+  const [contractLoaded, setContractLoaded] = useState(false);
 
   const links = [{ href: "/dashboard#projects", label: "Projects" }];
 
@@ -141,52 +150,83 @@ const Home: NextPage = () => {
     // })
   };
 
-  // const downloadAbi = useCallback(async () => {
-  //   if (currentAccount && project) {
-  //     // Router.push(`/project/${project.id}/abi`);
-  //   }
-  // }, [currentAccount, project]);
-
-  // const abiUrl = useCallback(() => {
-  //   if (project) {
-  //     return `${process.env.BASE_URL_PROJECT_DATA_DIR}/${
-  //       project.meta.generated
-  //     }/${toPascalCase(project.meta.generated)}-${project._id}-ABI.json`;
-  //   }
-  //   return "";
-  // }, [project]);
-
-  const doDeploy = async (network: string): Promise<any> => {
-    setInDeploy(true);
-
-    return new Promise((resolve, reject) => {
-      fw.post(`/v1/deploy`, {
-        projectId: project._id,
-        network: network.toLowerCase(),
-      })
-        .then((resp) => {
-          if (resp.error || resp.errors) {
-            console.error("[ERROR]", resp.error || resp.errors);
-            alert(formatError(resp.error || resp.errors));
-            setInDeploy(false);
-            reject(resp.error || resp.errors);
-          }
-          console.log(
-            "🚀 ~ file: ProjectItem.tsx ~ line 32 ~ fw.post ~ resp",
-            resp
+  useEffect(() => {
+    async function fetchData() {
+      console.log("detectEthereumProvider...");
+      try {
+        const provider: any = await detectEthereumProvider();
+        if (!provider) {
+          setErrorInfo(
+            "You have no Metamask installed, please install Metamask first"
           );
-          setInDeploy(false);
-          resolve(resp.result);
-        })
-        .catch((err) => {
-          console.log(
-            "🚀 ~ file: ProjectItem.tsx ~ line 57 ~ doDeploy ~ err",
-            err
-          );
-          reject(err);
-        });
-    });
-  };
+          setNoMetamask(true);
+          return;
+        }
+        console.log(
+          "🚀 ~ file: index.tsx ~ line 142 ~ fetchData ~ provider",
+          provider
+        );
+        const _web3 = new Web3(provider);
+        setWeb3(_web3);
+        console.log("web3 loaded");
+      } catch (err) {
+        console.log("web3 not loaded");
+        console.log("ERROR:", err);
+        setErrorInfo("Cannot load Web3");
+      }
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (web3 && networkSupported) {
+      const contractAddress = process.env.CHAINBOX_PROXY_CONTRACT;
+      if (!contractAddress) {
+        throw Error("CHAINBOX_PROXY_CONTRACT is not defined");
+      }
+      console.log("SC address:", contractAddress);
+      setContract(
+        new web3.eth.Contract(
+          contractAbi.abi as unknown as AbiItem,
+          contractAddress
+        )
+      );
+      console.log("contract loaded");
+      setContractLoaded(true);
+    }
+  }, [web3, networkSupported]);
+
+  // const doDeploy = async (network: string): Promise<any> => {
+  //   setInDeploy(true);
+
+  //   return new Promise((resolve, reject) => {
+  //     fw.post(`/v1/deploy`, {
+  //       projectId: project._id,
+  //       network: network.toLowerCase(),
+  //     })
+  //       .then((resp) => {
+  //         if (resp.error || resp.errors) {
+  //           console.error("[ERROR]", resp.error || resp.errors);
+  //           alert(formatError(resp.error || resp.errors));
+  //           setInDeploy(false);
+  //           reject(resp.error || resp.errors);
+  //         }
+  //         console.log(
+  //           "🚀 ~ file: ProjectItem.tsx ~ line 32 ~ fw.post ~ resp",
+  //           resp
+  //         );
+  //         setInDeploy(false);
+  //         resolve(resp.result);
+  //       })
+  //       .catch((err) => {
+  //         console.log(
+  //           "🚀 ~ file: ProjectItem.tsx ~ line 57 ~ doDeploy ~ err",
+  //           err
+  //         );
+  //         reject(err);
+  //       });
+  //   });
+  // };
 
   return (
     <div className={`pt-16 md:pt-0 flex flex-col items-center`}>
@@ -218,44 +258,48 @@ const Home: NextPage = () => {
               <div>ID: {project._id}</div>
             </div>
             <div className="mt-10">
-              {!project.deployed && (
+              {(!project.deployed && web3 && contract) && (
                 <div className="flex flex-col space-y-5">
                   <DeployBox
                     project={project}
+                    web3={web3}
+                    contract={contract}
                     item={deployments.find(
                       (deployment) => deployment.network === "chainbox"
                     )}
-                    doDeploy={doDeploy}
                     network="chainbox"
                     networkId="chainbox"
                     disabled={inDeploy}
                   />
                   <DeployBox
                     project={project}
+                    web3={web3}
+                    contract={contract}
                     item={deployments.find(
                       (deployment) => deployment.network === "rinkeby"
                     )}
-                    doDeploy={doDeploy}
                     network="rinkeby"
                     networkId="rinkeby"
                     disabled={inDeploy}
                   />
                   <DeployBox
                     project={project}
+                    web3={web3}
+                    contract={contract}
                     item={deployments.find(
                       (deployment) => deployment.network === "mainnet"
                     )}
-                    doDeploy={doDeploy}
                     network="ethereum"
                     networkId="mainnet"
                     disabled={inDeploy}
                   />
                   <DeployBox
                     project={project}
+                    web3={web3}
+                    contract={contract}
                     item={deployments.find(
                       (deployment) => deployment.network === "polygon-main"
                     )}
-                    doDeploy={doDeploy}
                     network="polygon"
                     networkId="polygon-main"
                     disabled={inDeploy}
@@ -273,150 +317,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
-const explorerUrl = (network: string) => {
-  if (network === "chainbox") {
-    return "https://scan.chainbox.id";
-  } else if (network === "rinkeby") {
-    return "https://rinkeby.etherscan.io";
-  } else if (network === "mainnet") {
-    return "https://etherscan.io";
-  } else if (network === "polygon") {
-    return "https://polygonscan.com";
-  } else if (network === "bsc") {
-    return "https://bscscan.com";
-  } else {
-    return "???";
-  }
-};
-
-interface DeployBoxProps {
-  item: any;
-  network: string;
-  networkId: string;
-  disabled: boolean;
-  project: any;
-  doDeploy: (network: string) => Promise<any>;
-}
-
-const DeployBox: FC<DeployBoxProps> = ({
-  item,
-  doDeploy,
-  network,
-  networkId,
-  disabled,
-  project,
-}) => {
-  const [loading, setLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [_item, setItem] = useState<any>(null);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setItem(item);
-      setLoaded(true);
-    }, 1000);
-  }, [item]);
-
-  // https://rinkeby.etherscan.io/tx/0x63f7b40138839499fe5c76fd1bae2d5ef2419faca3e1831ffd1bdf7773035c72
-
-  const isDeployed = item != null;
-  let _disabled = disabled || isDeployed;
-  const _caption = isDeployed ? "Deployed" : "Deploy";
-  return (
-    <div className="border p-2 text-center w-96">
-      <div className="mb-2">{toHeaderCase(network)}</div>
-      {_item && (
-        <div className="text-sm">
-          <div>
-            <div>Contract address:</div> 
-            <div>
-              <Link href={`${explorerUrl(network)}/address/${_item.contractAddress}`}>
-                <a target="_blank" className="link hover:text-blue-300">{_item.contractAddress}</a>
-              </Link>
-            </div>
-          </div>
-          <div>
-            TX:&nbsp;
-            <Link href={`${explorerUrl(network)}/tx/${_item.txHash}`}>
-              <a target="_balnk" className="link hover:text-blue-300">
-                {shortenHash(_item.txHash)}
-              </a>
-            </Link>
-          </div>
-
-          <div>
-            <Link
-              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${_item.abiFile}`}
-            >
-              <a
-                className="p-2 link text-sm underline hover:text-blue-300"
-                target="_blank"
-              >
-                Download ABI
-              </a>
-            </Link>
-          </div>
-        </div>
-      )}
-      {!loaded && <Loading />}
-      {!isDeployed && !_item && (
-        <SmallButton
-          caption={_caption}
-          color="bg-orange-600"
-          onClick={() => {
-            if (_disabled) {
-              return;
-            }
-            setLoading(true);
-            doDeploy(networkId)
-              .then((result: any) => {
-                console.log(
-                  "🚀 ~ file: project.tsx ~ line 309 ~ doDeploy ~ result",
-                  result
-                );
-                // success
-                setItem(result);
-              })
-              .finally(() => {
-                setLoading(false);
-              });
-          }}
-          loading={loading}
-          disabled={_disabled}
-        />
-      )}
-    </div>
-  );
-};
-
-function watchTransaction(web3: Web3, txHash: any): Promise<any> {
-  console.log("🚀 tx.hash", txHash);
-  return new Promise<any>((resolve, reject) => {
-    web3.eth
-      .getTransactionReceipt(txHash)
-      .then((receipt: any) => {
-        console.log(
-          "🚀 ~ file: MintDialog.tsx ~ line 165 ~ web3.eth.getTransactionReceipt ~ receipt",
-          receipt
-        );
-
-        if (!receipt || !receipt.status) {
-          console.log("no receipt");
-          resolve(null);
-          return;
-        }
-
-        if (receipt.blockNumber > 0) {
-          // onMintSuccess(tx);
-          // setInCreating(false);
-          resolve(receipt);
-        }
-      })
-      .catch((err: any) => {
-        console.error(err);
-        console.log("Cannot watch transaction");
-        reject(err);
-      });
-  });
-}

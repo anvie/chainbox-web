@@ -19,6 +19,7 @@ const nextConfig = {
   env: {
     API_BASE_URL: process.env.API_BASE_URL,
     BASE_URL_PROJECT_DATA_DIR: process.env.BASE_URL_PROJECT_DATA_DIR,
+    CHAINBOX_PROXY_CONTRACT: process.env.CHAINBOX_PROXY_CONTRACT,
   }
 };
 

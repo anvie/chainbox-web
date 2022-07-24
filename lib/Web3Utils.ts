@@ -1,9 +1,12 @@
-const Web3 = require("web3");
+// this code is for server only
+
+// const Web3 = require("web3");
+
+import Web3 from "web3";
 
 if (!process.env.NETWORK_PROVIDER) {
   throw new Error("Please set NETWORK_PROVIDER environment variable");
 }
-// const web3 = new Web3(process.env.NETWORK_PROVIDER);
 
 const provider = new Web3.providers.HttpProvider(process.env.NETWORK_PROVIDER);
 
@@ -17,6 +20,9 @@ const provider = new Web3.providers.HttpProvider(process.env.NETWORK_PROVIDER);
 // })
 
 const web3 = new Web3(provider);
+
+
+
 
 export { web3 };
 
