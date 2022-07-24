@@ -332,7 +332,7 @@ const Home: NextPage = () => {
                       (deployment) => deployment.network === "polygon-main"
                     )}
                     network="polygon"
-                    networkId="polygon-main"
+                    networkId="polygon"
                     disabled={inDeploy}
                   />
                 </div>
