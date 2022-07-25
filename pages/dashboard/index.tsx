@@ -20,7 +20,7 @@ import { shortenAddress } from "../../lib/Utils";
 import ProjectsPage from "../../components/ProjectsPage";
 import ProfilePage from "../../components/ProfilePage";
 // import { UserContext } from "../../lib/UserContext";
-import { isNetworkSupported } from "../../lib/chainutils";
+import { isNetworkSupported, supportedNetworks } from "../../lib/chainutils";
 
 const messageFormat =
   "Please sign this message to ensure you have right access to your wallet.";
@@ -64,6 +64,7 @@ const Home: NextPage = () => {
 
   const checkNetwork = () => {
     const chainId = parseInt((window.ethereum as any)?.chainId, 16);
+    console.log("🚀 ~ file: index.tsx ~ line 67 ~ checkNetwork ~ chainId", chainId)
     if (isNaN(chainId)) {
       return;
     }
@@ -186,7 +187,8 @@ const Home: NextPage = () => {
       <main className={`flex flex-col w-2/3 justify-center items-center`}>
         {!networkSupported && (
           <div className="p-5 bg-orange-500 rounded-xl mb-10">
-            Network not supported, please change to Ethereum mainnet
+            <div>Network not supported, please change to supported network:</div>
+            <div>{supportedNetworks.join(", ")}</div>
           </div>
         )}
 
@@ -214,8 +216,8 @@ const Home: NextPage = () => {
           </div>
         )}
 
-        {page == 0 && currentAccount && <ProjectsPage />}
-        {page == 1 && currentAccount && <ProfilePage />}
+        {(page == 0 && currentAccount && networkSupported) && <ProjectsPage />}
+        {(page == 1 && currentAccount && networkSupported) && <ProfilePage />}
       </main>
 
       <Footer />

@@ -44,7 +44,7 @@ const ProjectsPage = () => {
         <div className="flex justify-center items-center">
           <h1>Projects</h1>
           <div className="ml-10">
-            <Button caption="+ Add" onClick={showAddProjectDialog} />
+            {<Button caption="+ Add" onClick={showAddProjectDialog} />}
           </div>
         </div>
 
