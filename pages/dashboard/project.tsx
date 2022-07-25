@@ -289,7 +289,7 @@ const Home: NextPage = () => {
                 </span>
                 <span className="ml-2 text-sm">[{networkId && contract && publicRuntimeConfig.proxyContractAddresses && publicRuntimeConfig.proxyContractAddresses[networkId] }]</span>
               </div>
-              {!project.deployed && web3 && contract && (
+              {(!project.deployed && web3 && contract && networkId) && (
                 <div className="flex flex-col space-y-5">
                   <DeployBox
                     project={project}
@@ -301,6 +301,7 @@ const Home: NextPage = () => {
                     network="chainbox"
                     networkId="chainbox"
                     disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
                   />
                   <DeployBox
                     project={project}
@@ -312,6 +313,7 @@ const Home: NextPage = () => {
                     network="rinkeby"
                     networkId="rinkeby"
                     disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
                   />
                   <DeployBox
                     project={project}
@@ -323,6 +325,7 @@ const Home: NextPage = () => {
                     network="ethereum"
                     networkId="mainnet"
                     disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
                   />
                   <DeployBox
                     project={project}
@@ -334,6 +337,7 @@ const Home: NextPage = () => {
                     network="polygon"
                     networkId="polygon"
                     disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
                   />
                 </div>
               )}

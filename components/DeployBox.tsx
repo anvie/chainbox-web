@@ -37,6 +37,7 @@ interface DeployBoxProps {
   project: any;
   web3: Web3;
   contract: Contract;
+  currentConnectedNetwork: string
   // doDeploy: (network: string) => Promise<any>;
 }
 
@@ -48,6 +49,7 @@ const DeployBox: FC<DeployBoxProps> = ({
   project,
   web3,
   contract,
+  currentConnectedNetwork
   // doDeploy,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -86,8 +88,14 @@ const DeployBox: FC<DeployBoxProps> = ({
   }, [inDeployment])
   
 
-  const _doDeploy = async (network: string): Promise<any> => {
+  const _doDeploy = async (): Promise<any> => {
     if (isDisabled) {
+      return;
+    }
+
+    // check is network currently user connected is the same as the network the project is going to deployed on
+    if (currentConnectedNetwork !== networkId) {
+      setErrorInfo(`You are not connected to ${toHeaderCase(network)} network. Please switch your network.`);
       return;
     }
 
