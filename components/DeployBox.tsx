@@ -65,10 +65,15 @@ const DeployBox: FC<DeployBoxProps> = ({
   useEffect(() => {
     setTimeout(() => {
       setItem(item);
-      setInDeployment(
-        project.meta.deployment &&
-          project.meta.deployment[networkId]?.status === "in progress"
-      );
+      if (project.meta.deployment && project.meta.deployment[networkId]) {
+        if (project.meta.deployment[networkId]?.status === "in progress") {
+          setInDeployment(true);
+        }
+        if (project.meta.deployment[networkId]?.status) {
+          setCaption(project.meta.deployment[networkId]?.status);
+          setIsDisabled(true);
+        }
+      }
       setLoaded(true);
     }, 1000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -282,7 +287,7 @@ const DeployBox: FC<DeployBoxProps> = ({
         <div className="p-2 bg-red-500 text-white mb-2">{errorInfo}</div>
       )}
       {!loaded && <Loading />}
-      {!isDeployed && !_item && (
+      {loaded && !isDeployed && !_item && (
         <div>
           {gasPrices && (
             <div className=" text-gray-400 text-sm pt-2 pb-2 mb-2">
