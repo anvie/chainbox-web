@@ -1,5 +1,5 @@
 // import useSWR from "swr";
-import { toHeaderCase } from "js-convert-case";
+import { toHeaderCase, toPascalCase } from "js-convert-case";
 import Link from "next/link";
 import { FC, useEffect, useState } from "react";
 import { Contract } from "web3-eth-contract";
@@ -232,6 +232,16 @@ const DeployBox: FC<DeployBoxProps> = ({
                 target="_blank"
               >
                 Download ABI
+              </a>
+            </Link>
+            <Link
+              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/build/contracts/${toPascalCase(project.name)}.json`}
+            >
+              <a
+                className="p-2 link text-sm underline hover:text-blue-300"
+                target="_blank"
+              >
+                Download FJF
               </a>
             </Link>
           </div>
