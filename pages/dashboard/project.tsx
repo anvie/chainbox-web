@@ -332,7 +332,7 @@ const Home: NextPage = () => {
               {/* IMAGE ------------------------------ */}
 
               <Image
-                src={`https://meta.chainbox.id/${project._id}/default.png`}
+                src={`https://meta.chainbox.id/${project._id}/` + (project.meta.image ? project.meta.image : "default.png")}
                 alt="Project image"
                 loader={({ src }) => src}
                 width="200px"
