@@ -20,7 +20,7 @@ const nextConfig = {
     proxyContractAddresses: {
       'chainbox': '0x7c7Ed36F163B3CD38d32e608A7A1429479933EA0',
       'rinkeby': '0x757b3F16eF32D97fDEea8bA442823eD4c76926A6',
-      'ethereum': '0x0000000000000000000000000000000000000000',
+      'ethereum': '0x5adf2C010e960d475679FA9Bb178B3FD4CbE4d1c',
       'polygon': '0x757b3F16eF32D97fDEea8bA442823eD4c76926A6',
       'bsc': '0x0000000000000000000000000000000000000000',
     }
