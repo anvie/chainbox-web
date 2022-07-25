@@ -301,7 +301,7 @@ const Home: NextPage = () => {
         }
         const { zipFileName } = resp.result;
         window.open(
-          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project._id}/${zipFileName}`,
+          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${zipFileName}`,
           "_blank"
         );
       })
