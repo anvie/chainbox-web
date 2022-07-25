@@ -7,8 +7,7 @@ import { shortenAddress } from "../lib/Utils";
 
 type LinksType = Array<{ href: string; label: string; onClick?: () => void }>;
 
-const DEFAULT_LINKS: LinksType = [
-];
+const DEFAULT_LINKS: LinksType = [];
 
 interface Props {
   links?: LinksType;
@@ -100,6 +99,16 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
               }
             })}
 
+          {!noDasboard &&
+          router.pathname !== "/dashboard" &&
+          !router.pathname.startsWith("/cp") ? (
+            <Link href="/dashboard" passHref={true}>
+              <div className="block mt-4 lg:inline-block lg:mt-0 cursor-pointer from-orange-300 to-pink-600 text-lg">
+                Dashboard
+              </div>
+            </Link>
+          ) : null}
+
           {currentAccount && (
             <Link href="/dashboard#profile" passHref={true}>
               <div className="block mt-5  lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-sm">
@@ -116,15 +125,6 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
               [logout]
             </div>
           )}
-
-          {(!noDasboard && router.pathname !== "/dashboard" &&
-          !router.pathname.startsWith("/cp")) ? (
-            <Link href="/dashboard" passHref={true}>
-              <div className="block mt-4 lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-lg">
-                Dashboard
-              </div>
-            </Link>
-          ) : null}
         </div>
       </div>
     </nav>
