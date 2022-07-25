@@ -14,7 +14,7 @@ const Section1 = () => {
         </div>
 
         <p className={`${styles.description} max-w-xl`}>
-        Chainbox is a tool to simplify the process of creating Web3 project.
+        Simplify the process of creating Web3 project.
         </p>
         <p className={`${styles.description} max-w-xl pt-2`}>
         From generating smart contract, deploying into blockchain,
@@ -27,10 +27,10 @@ const Section1 = () => {
 
       <div className="image-art">
         <Image
-          src="image-art.svg"
+          src="hero-image.png"
           alt="Chainbox art"
-          height="300"
-          width="300"
+          height="294"
+          width="400"
           loader={imageLoader}
         />
       </div>
