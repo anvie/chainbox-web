@@ -25,6 +25,16 @@ async function post(endpoint:string, body:object) {
     return handleResponse(response);
 }
 
+async function postRaw(endpoint:string, body:any) {
+    const requestOptions:RequestInit = {
+        method: 'POST',
+        headers: { ...authHeader(getUrl(endpoint)) },
+        body
+    };
+    const response = await fetch(getUrl(endpoint), requestOptions);
+    return handleResponse(response);
+}
+
 async function put(endpoint:string, body:object) {
     const requestOptions = {
         method: 'PUT',
@@ -61,7 +71,7 @@ async function handleResponse(response: Response) {
     return data;
 }
 
-const _module = { get, post, put };
+const _module = { get, post, postRaw, put };
 
 export default _module;
 

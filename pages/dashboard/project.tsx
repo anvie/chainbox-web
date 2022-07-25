@@ -245,21 +245,26 @@ const Home: NextPage = () => {
   //   });
   // };
 
-
-  const uploadToClient = (event:any) => {
+  const uploadToClient = (event: any) => {
     if (event.target.files && event.target.files[0]) {
       const img = event.target.files[0];
-      console.log("🚀 ~ file: project.tsx ~ line 252 ~ uploadToClient ~ img", img)
+      console.log(
+        "🚀 ~ file: project.tsx ~ line 252 ~ uploadToClient ~ img",
+        img
+      );
       setImage(img);
     }
   };
 
-  const uploadImage = async (event:any) => {
+  const uploadImage = async (event: any) => {
+    if (!project){
+      return;
+    }
     const body = new FormData();
     body.append("image", image);
-    const resp = await (await fetch(`${process.env.API_BASE_URL}/v1/upload`, {method: 'POST', body })).json();
-    console.log("🚀 ~ file: project.tsx ~ line 251 ~ uploadImage ~ resp", resp)
-  }
+    const resp = await fw.postRaw(`/v1/project/${project._id}/upload`, body);
+    console.log("🚀 ~ file: project.tsx ~ line 251 ~ uploadImage ~ resp", resp);
+  };
 
   return (
     <div className={`pt-16 md:pt-0 flex flex-col items-center`}>
@@ -338,10 +343,17 @@ const Home: NextPage = () => {
                 method="post"
                 action={process.env.API_BASE_URL + "/v1/upload"}
                 encType="multipart/form-data"
-                onSubmit={(e:any) => {e.preventDefault();}}
+                onSubmit={(e: any) => {
+                  e.preventDefault();
+                }}
               >
                 <input type="file" name="image" onChange={uploadToClient} />
-                <button type="submit" name="upload" className="border rounded-md hover:shadow-sm p-2 mt-2" onClick={uploadImage}>
+                <button
+                  type="submit"
+                  name="upload"
+                  className="border rounded-md hover:shadow-sm p-2 mt-2"
+                  onClick={uploadImage}
+                >
                   upload default image
                 </button>
               </form>
