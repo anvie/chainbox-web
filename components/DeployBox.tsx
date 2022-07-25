@@ -9,7 +9,7 @@ import SmallButton from "./SmallButton";
 import fw from "../lib/FetchWrapper";
 import Web3 from "web3";
 import { userAccess } from "../lib/UserAccess";
-import { getPrice } from "../lib/pricing";
+import { getPrice, getPriceHuman } from "../lib/pricing";
 import { watchTransaction } from "../lib/txutils";
 import { ethRpcError } from "../lib/ErrorHandler";
 
@@ -37,7 +37,8 @@ interface DeployBoxProps {
   project: any;
   web3: Web3;
   contract: Contract;
-  currentConnectedNetwork: string
+  currentConnectedNetwork: string;
+  gasPrices: any;
   // doDeploy: (network: string) => Promise<any>;
 }
 
@@ -49,7 +50,8 @@ const DeployBox: FC<DeployBoxProps> = ({
   project,
   web3,
   contract,
-  currentConnectedNetwork
+  currentConnectedNetwork,
+  gasPrices,
   // doDeploy,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -63,12 +65,14 @@ const DeployBox: FC<DeployBoxProps> = ({
   useEffect(() => {
     setTimeout(() => {
       setItem(item);
-      setInDeployment((project.meta.deployment && project.meta.deployment[networkId]?.status === 'in progress'));
+      setInDeployment(
+        project.meta.deployment &&
+          project.meta.deployment[networkId]?.status === "in progress"
+      );
       setLoaded(true);
     }, 1000);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item]);
-
 
   const isDeployed = item != null;
   // let _disabled = disabled || isDeployed;
@@ -76,38 +80,39 @@ const DeployBox: FC<DeployBoxProps> = ({
   // let _caption = isDeployed ? "Deployed" : "Deploy";
 
   useEffect(() => {
-    let iVal:NodeJS.Timer | null = null;
-    if (inDeployment){
+    let iVal: NodeJS.Timer | null = null;
+    if (inDeployment) {
       // _disabled = true;
       setCaption("deploying...");
       setIsDisabled(true);
 
       iVal = setInterval(() => {
-        fw.get(`/v1/project-status/${project._id}?network=${network}`).then(data => {
-          if (data && data.result){
-            setCaption("Deployed");
-            setItem(data.result);
-            if (iVal){
-              clearInterval(iVal)
-              iVal = null;
+        fw.get(`/v1/project-status/${project._id}?network=${network}`).then(
+          (data) => {
+            if (data && data.result) {
+              setCaption("Deployed");
+              setItem(data.result);
+              if (iVal) {
+                clearInterval(iVal);
+                iVal = null;
+              }
             }
           }
-        });
+        );
       }, 5000);
-    }else{
+    } else {
       // _disabled = false;
-      setCaption("Deploy");
+      setCaption(`Deploy`);
       setIsDisabled(false);
     }
 
-    return ()=>{
-      if (iVal){
+    return () => {
+      if (iVal) {
         clearInterval(iVal);
         iVal = null;
       }
-    }
-  }, [inDeployment])
-  
+    };
+  }, [inDeployment]);
 
   const _doDeploy = async (): Promise<any> => {
     if (isDisabled) {
@@ -116,9 +121,19 @@ const DeployBox: FC<DeployBoxProps> = ({
 
     // check is network currently user connected is the same as the network the project is going to deployed on
     if (currentConnectedNetwork.toLowerCase() !== networkId) {
-      console.log("🚀 ~ file: DeployBox.tsx ~ line 98 ~ const_doDeploy= ~ networkId", networkId)
-      console.log("🚀 ~ file: DeployBox.tsx ~ line 98 ~ const_doDeploy= ~ currentConnectedNetwork", currentConnectedNetwork)
-      setErrorInfo(`You are not connected to ${toHeaderCase(network)} network. Please switch your network.`);
+      console.log(
+        "🚀 ~ file: DeployBox.tsx ~ line 98 ~ const_doDeploy= ~ networkId",
+        networkId
+      );
+      console.log(
+        "🚀 ~ file: DeployBox.tsx ~ line 98 ~ const_doDeploy= ~ currentConnectedNetwork",
+        currentConnectedNetwork
+      );
+      setErrorInfo(
+        `You are not connected to ${toHeaderCase(
+          network
+        )} network. Please switch your network.`
+      );
       return;
     }
 
@@ -126,7 +141,7 @@ const DeployBox: FC<DeployBoxProps> = ({
     setInDeployment(true);
     setErrorInfo(null);
 
-    const {ethAddress} = userAccess.accessValue
+    const { ethAddress } = userAccess.accessValue;
     const price = getPrice(networkId);
 
     if (contract && web3 && ethAddress) {
@@ -199,18 +214,32 @@ const DeployBox: FC<DeployBoxProps> = ({
     // });
   };
 
-  const style:any = {"minWidth": '400px'};
+  const style: any = { minWidth: "400px" };
 
   return (
-    <div className="border p-2 text-center w-96 text-white bg-gray-700 rounded-md" style={style}>
-      <div className="mb-2">{toHeaderCase(network)}</div>
+    <div
+      className="border p-2 text-center w-96 text-white bg-gray-700 rounded-md"
+      style={style}
+    >
+      <div className="mb-2">
+        <span>{toHeaderCase(network)}</span>
+        {["rinkeby", "chainbox"].includes(network) && (
+          <span>&nbsp;[testnet]</span>
+        )}
+      </div>
       {_item && (
         <div className="text-sm">
           <div>
-            <div>Contract address:</div> 
+            <div>Contract address:</div>
             <div>
-              <Link href={`${explorerUrl(network)}/address/${_item.contractAddress}`}>
-                <a target="_blank" className="link hover:text-blue-300">{_item.contractAddress}</a>
+              <Link
+                href={`${explorerUrl(network)}/address/${
+                  _item.contractAddress
+                }`}
+              >
+                <a target="_blank" className="link hover:text-blue-300">
+                  {_item.contractAddress}
+                </a>
               </Link>
             </div>
           </div>
@@ -235,7 +264,9 @@ const DeployBox: FC<DeployBoxProps> = ({
               </a>
             </Link>
             <Link
-              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/build/contracts/${toPascalCase(project.name)}.json`}
+              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${
+                project.meta.generated
+              }/build/contracts/${toPascalCase(project.name)}.json`}
             >
               <a
                 className="p-2 link text-sm underline hover:text-blue-300"
@@ -247,21 +278,29 @@ const DeployBox: FC<DeployBoxProps> = ({
           </div>
         </div>
       )}
-      {errorInfo && (<div className="p-2 bg-red-500 text-white mb-2">{errorInfo}</div>)}
+      {errorInfo && (
+        <div className="p-2 bg-red-500 text-white mb-2">{errorInfo}</div>
+      )}
       {!loaded && <Loading />}
-      {(!isDeployed && !_item) && (
-        <SmallButton
-          caption={caption}
-          color="bg-orange-600"
-          onClick={_doDeploy}
-          loading={loading}
-          disabled={isDisabled}
-        />
+      {!isDeployed && !_item && (
+        <div>
+          {gasPrices && (
+            <div className=" text-gray-400 text-sm pt-2 pb-2 mb-2">
+              <div>Deployment price: <span className="font-semibold">{getPriceHuman(networkId)}</span></div>
+              <div>Current avg gas price: {gasPrices[networkId]} Gwei</div>
+            </div>
+          )}
+          <SmallButton
+            caption={caption}
+            color="bg-orange-600"
+            onClick={_doDeploy}
+            loading={loading}
+            disabled={isDisabled}
+          />
+        </div>
       )}
     </div>
   );
-}
+};
 
 export default DeployBox;
-
-

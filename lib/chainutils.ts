@@ -33,3 +33,38 @@ export function chainIdToNetworkName(chainId: number): string {
       return "Unknown";
   }
 }
+
+export function getSymbol(chainId: number): string {
+  switch (chainId) {
+    case 1:
+      return "ETH";
+    case 4:
+      return "ETH";
+    case 137:
+      return "POLY";
+    case 56:
+      return "MATIC";
+    case 1919:
+      return "CHB";
+    default:
+      return "???";
+  }
+}
+
+// get symbol from network id
+export function getSymbolFromNetworkId(networkId: string): string {
+  switch (networkId){
+    case "ethereum":
+      return "ETH";
+    case "rinkeby":
+      return "rkETH";
+    case "polygon":
+      return "MATIC";
+    case "bsc":
+      return "BNB";
+    case "chainbox":
+      return "CHB";
+    default:
+      return "???";
+  }
+}

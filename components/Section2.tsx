@@ -8,7 +8,6 @@ const Section1 = () => {
       <div
         className={`${styles.overview} justify-center items-left flex flex-col`}
       >
-        <div>About</div>
         <div className="block font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-lg">
           Chainbox
         </div>

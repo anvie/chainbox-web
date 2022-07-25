@@ -16,6 +16,8 @@ import DeployBox from "../../components/DeployBox";
 import contractAbiChainbox from "../../lib/ChainboxProxy-abi-chainbox.json";
 import contractAbiRinkeby from "../../lib/ChainboxProxy-abi-rinkeby.json";
 import contractAbiPolygon from "../../lib/ChainboxProxy-abi-polygon.json";
+import contractAbiEthereum from "../../lib/ChainboxProxy-abi-ethereum.json";
+
 import { chainIdToNetworkName, isNetworkSupported } from "../../lib/chainutils";
 import getConfig from "next/config";
 import imageLoader from "../../imageLoader";
@@ -27,6 +29,7 @@ const CONTRACT_ABIS: any = {
   chainbox: contractAbiChainbox,
   rinkeby: contractAbiRinkeby,
   polygon: contractAbiPolygon,
+  ethereum: contractAbiEthereum
 };
 
 const Home: NextPage = () => {
@@ -46,6 +49,7 @@ const Home: NextPage = () => {
   const [networkId, setNetworkId] = useState<string | null>(null);
   const [image, setImage] = useState<any>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [gasPrices, setGasPrices] = useState<any>(null);
 
   const links = [{ href: "/dashboard#projects", label: "Projects" }];
 
@@ -213,6 +217,18 @@ const Home: NextPage = () => {
       setContractLoaded(true);
     }
   }, [web3, networkSupported, networkId]);
+
+  useEffect(() => {
+    // get gas prices
+    fw.get("/v1/gas-prices").then((res: any) => {
+      console.log("🚀 ~ file: project.tsx ~ line 224 ~ fw.get ~ res", res)
+      if (res.result) {
+        setGasPrices(res.result.gasPrices);
+      }
+    }).catch((err: any) => {
+      console.error("[ERROR]", err);
+    })
+  }, [])
 
   // const doDeploy = async (network: string): Promise<any> => {
   //   setInDeploy(true);
@@ -396,6 +412,7 @@ const Home: NextPage = () => {
                   networkId="chainbox"
                   disabled={inDeploy}
                   currentConnectedNetwork={networkId}
+                  gasPrices={gasPrices}
                 />
                 <DeployBox
                   project={project}
@@ -408,30 +425,33 @@ const Home: NextPage = () => {
                   networkId="rinkeby"
                   disabled={inDeploy}
                   currentConnectedNetwork={networkId}
+                  gasPrices={gasPrices}
                 />
                 <DeployBox
                   project={project}
                   web3={web3}
                   contract={contract}
                   item={deployments.find(
-                    (deployment) => deployment.network === "mainnet"
+                    (deployment) => deployment.network === "ethereum"
                   )}
                   network="ethereum"
-                  networkId="mainnet"
+                  networkId="ethereum"
                   disabled={inDeploy}
                   currentConnectedNetwork={networkId}
+                  gasPrices={gasPrices}
                 />
                 <DeployBox
                   project={project}
                   web3={web3}
                   contract={contract}
                   item={deployments.find(
-                    (deployment) => deployment.network === "polygon-main"
+                    (deployment) => deployment.network === "polygon"
                   )}
                   network="polygon"
                   networkId="polygon"
                   disabled={inDeploy}
                   currentConnectedNetwork={networkId}
+                  gasPrices={gasPrices}
                 />
               </div>
             </div>
