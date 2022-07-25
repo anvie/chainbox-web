@@ -61,6 +61,7 @@ const DeployBox: FC<DeployBoxProps> = ({
   const [inDeployment, setInDeployment] = useState(false);
   const [caption, setCaption] = useState("Deploy");
   const [isDisabled, setIsDisabled] = useState(false);
+  const [inDownloadSji, setInDownloadSji] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -219,6 +220,37 @@ const DeployBox: FC<DeployBoxProps> = ({
     // });
   };
 
+  const downloadSji = async () => {
+    if (inDownloadSji) {
+      return;
+    }
+    setInDownloadSji(true);
+    fw.get(`/generate-contract-sji?projectId=${project._id}`)
+      .then((resp: any) => {
+        console.log("🚀 ~ file: project.tsx ~ line 316 ~ .then ~ resp", resp);
+        if (resp.error || resp.errors) {
+          console.error("[ERROR]", resp.error || resp.errors);
+          alert(formatError(resp.error || resp.errors));
+          return;
+        }
+        const { file } = resp.result;
+        window.open(
+          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${file}`,
+          "_blank"
+        );
+      })
+      .catch((err) => {
+        console.log(
+          "🚀 ~ file: project.tsx ~ line 329 ~ downloadSji ~ err",
+          err
+        );
+        alert("Error during generating standard json input file");
+      })
+      .finally(() => {
+        setInDownloadSji(false);
+      });
+  };
+
   const style: any = { minWidth: "400px" };
 
   return (
@@ -268,18 +300,13 @@ const DeployBox: FC<DeployBoxProps> = ({
                 Download ABI
               </a>
             </Link>
-            <Link
-              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${
-                project.meta.generated
-              }/build/contracts/${toPascalCase(project.name)}.json`}
+
+            <span
+              className="p-2 link text-sm underline hover:text-blue-300"
+              onClick={downloadSji}
             >
-              <a
-                className="p-2 link text-sm underline hover:text-blue-300"
-                target="_blank"
-              >
-                Download FJS
-              </a>
-            </Link>
+              Download SJI
+            </span>
           </div>
         </div>
       )}
