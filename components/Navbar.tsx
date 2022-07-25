@@ -107,7 +107,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
 
           {currentAccount && (
             <Link href="/dashboard#profile" passHref={true}>
-              <div className="flex items-center text-center align-center">
+              <div className="flex items-center text-center align-center pl-5">
               <div className="block mt-5 lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-sm">
                 {shortenAddress(currentAccount)}
               </div>

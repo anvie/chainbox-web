@@ -31,18 +31,18 @@ const Home: NextPage = () => {
       </main>
 
 
-      <FAQ />
+      {/* <FAQ /> */}
 
       <footer className={styles.footer}>
         <div className="flex flex-col place-items-center items-center justify-center pt-10">
           {/* <div className="blur-dot-blue2 hidden md:block" /> */}
-          <Image
+          {/* <Image
             src="Chainbox-logo.png"
             alt="Chainbox Logo"
             width={300}
             height={300}
             loader={imageLoader}
-          />
+          /> */}
           <div className="pt-10 pb-10 text-center">
             Copyright &copy; 2022 Chainbox. All rights reserved.
           </div>

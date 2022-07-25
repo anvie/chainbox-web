@@ -199,7 +199,7 @@ const DeployBox: FC<DeployBoxProps> = ({
     // });
   };
 
-  const style:any = {"minWidth": '500px'};
+  const style:any = {"minWidth": '400px'};
 
   return (
     <div className="border p-2 text-center w-96 text-white bg-gray-700 rounded-md" style={style}>

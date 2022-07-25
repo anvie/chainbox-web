@@ -18,13 +18,15 @@ import contractAbiRinkeby from "../../lib/ChainboxProxy-abi-rinkeby.json";
 import contractAbiPolygon from "../../lib/ChainboxProxy-abi-polygon.json";
 import { chainIdToNetworkName, isNetworkSupported } from "../../lib/chainutils";
 import getConfig from "next/config";
+import imageLoader from "../../imageLoader";
+import Image from "next/image";
 
 const { publicRuntimeConfig } = getConfig();
 
 const CONTRACT_ABIS: any = {
   chainbox: contractAbiChainbox,
   rinkeby: contractAbiRinkeby,
-  polygon: contractAbiPolygon
+  polygon: contractAbiPolygon,
 };
 
 const Home: NextPage = () => {
@@ -42,6 +44,7 @@ const Home: NextPage = () => {
   const [contract, setContract] = useState<Contract | null>(null);
   const [contractLoaded, setContractLoaded] = useState(false);
   const [networkId, setNetworkId] = useState<string | null>(null);
+  const [image, setImage] = useState<any>(null);
 
   const links = [{ href: "/dashboard#projects", label: "Projects" }];
 
@@ -242,6 +245,22 @@ const Home: NextPage = () => {
   //   });
   // };
 
+
+  const uploadToClient = (event:any) => {
+    if (event.target.files && event.target.files[0]) {
+      const img = event.target.files[0];
+      console.log("🚀 ~ file: project.tsx ~ line 252 ~ uploadToClient ~ img", img)
+      setImage(img);
+    }
+  };
+
+  const uploadImage = async (event:any) => {
+    const body = new FormData();
+    body.append("image", image);
+    const resp = await (await fetch(`${process.env.API_BASE_URL}/v1/upload`, {method: 'POST', body })).json();
+    console.log("🚀 ~ file: project.tsx ~ line 251 ~ uploadImage ~ resp", resp)
+  }
+
   return (
     <div className={`pt-16 md:pt-0 flex flex-col items-center`}>
       <Head>
@@ -259,81 +278,135 @@ const Home: NextPage = () => {
 
       <div id="modal-root"></div>
 
-      <main className={`flex flex-col w-2/3 justify-center items-center`}>
+      <main className={`flex flex-col w-full p-5 items-center`}>
         {project && (
-          <div>
-            <h1>Project: {project.name}</h1>
-            <div className="mt-5">
-              <p>{project.description}</p>
-
-              {/* <div>Status: {project.deployed ? "DEPLOYED" : "DRAFT"}</div> */}
-              <div>Capped: {project.meta.capped.toString()}</div>
-              <div>Max supply: {project.meta.maxSupply.toString()}</div>
-              <div>ID: {project._id}</div>
-            </div>
-            <div className="mt-10">
-              <div className="mb-5">
-                Current connected network:{" "}
-                <span className="font-semibold text-green-500">
-                  {toHeaderCase(networkId || "Unknown")}
-                </span>
-                <div className="text-sm">[SC: {networkId && contract && publicRuntimeConfig.proxyContractAddresses && publicRuntimeConfig.proxyContractAddresses[networkId.toLowerCase()] }]</div>
-              </div>
-              {(!project.deployed && web3 && contract && networkId) && (
-                <div className="flex flex-col space-y-5">
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "chainbox"
-                    )}
-                    network="chainbox"
-                    networkId="chainbox"
-                    disabled={inDeploy}
-                    currentConnectedNetwork={networkId}
-                  />
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "rinkeby"
-                    )}
-                    network="rinkeby"
-                    networkId="rinkeby"
-                    disabled={inDeploy}
-                    currentConnectedNetwork={networkId}
-                  />
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "mainnet"
-                    )}
-                    network="ethereum"
-                    networkId="mainnet"
-                    disabled={inDeploy}
-                    currentConnectedNetwork={networkId}
-                  />
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "polygon-main"
-                    )}
-                    network="polygon"
-                    networkId="polygon"
-                    disabled={inDeploy}
-                    currentConnectedNetwork={networkId}
-                  />
+          <div className="items-start w-2/3">
+            <div>Project</div>
+            <h1>{project.name}</h1>
+          </div>
+        )}
+        {project && (
+          <div className="w-2/3 flex flex-col md:flex-row">
+            <div className="w-full">
+              <div className="mt-5">
+                <div className="mb-5">
+                  <p>{project.description}</p>
                 </div>
-              )}
+
+                {/* <div>Status: {project.deployed ? "DEPLOYED" : "DRAFT"}</div> */}
+                <div>
+                  Type: {project.kind === "ERC-721" && "NFT"} ({project.kind})
+                </div>
+                <div>Capped: {project.meta.capped.toString()}</div>
+                {project.meta.capped && (
+                  <div>Max supply: {project.meta.maxSupply.toString()}</div>
+                )}
+                <div>ID: {project._id}</div>
+              </div>
+              <div className="mt-10">
+                <div className="mb-5">
+                  Current connected network:{" "}
+                  <span className="font-semibold text-green-500">
+                    {toHeaderCase(networkId || "Unknown")}
+                  </span>
+                  <div className="text-sm">
+                    [SC:{" "}
+                    {networkId &&
+                      contract &&
+                      publicRuntimeConfig.proxyContractAddresses &&
+                      publicRuntimeConfig.proxyContractAddresses[
+                        networkId.toLowerCase()
+                      ]}
+                    ]
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-2/3 pl-10 justify-end flex flex-col pb-2">
+              {/* IMAGE ------------------------------ */}
+
+              <Image
+                src={`https://meta.chainbox.id/${project._id}/default.png`}
+                alt="Project image"
+                loader={({ src }) => src}
+                width="200px"
+                height="300px"
+              />
+
+              <form
+                method="post"
+                action={process.env.API_BASE_URL + "/v1/upload"}
+                encType="multipart/form-data"
+                onSubmit={(e:any) => {e.preventDefault();}}
+              >
+                <input type="file" name="image" onChange={uploadToClient} />
+                <button type="submit" name="upload" className="border rounded-md hover:shadow-sm p-2 mt-2" onClick={uploadImage}>
+                  upload default image
+                </button>
+              </form>
             </div>
           </div>
         )}
+
+        <div className="w-2/3">
+          {project && !project.deployed && web3 && contract && networkId && (
+            <div>
+              <div className="border"></div>
+              <div className="mb-5 mt-5">Deployments:</div>
+              <div className="flex flex-col space-y-5">
+                <DeployBox
+                  project={project}
+                  web3={web3}
+                  contract={contract}
+                  item={deployments.find(
+                    (deployment) => deployment.network === "chainbox"
+                  )}
+                  network="chainbox"
+                  networkId="chainbox"
+                  disabled={inDeploy}
+                  currentConnectedNetwork={networkId}
+                />
+                <DeployBox
+                  project={project}
+                  web3={web3}
+                  contract={contract}
+                  item={deployments.find(
+                    (deployment) => deployment.network === "rinkeby"
+                  )}
+                  network="rinkeby"
+                  networkId="rinkeby"
+                  disabled={inDeploy}
+                  currentConnectedNetwork={networkId}
+                />
+                <DeployBox
+                  project={project}
+                  web3={web3}
+                  contract={contract}
+                  item={deployments.find(
+                    (deployment) => deployment.network === "mainnet"
+                  )}
+                  network="ethereum"
+                  networkId="mainnet"
+                  disabled={inDeploy}
+                  currentConnectedNetwork={networkId}
+                />
+                <DeployBox
+                  project={project}
+                  web3={web3}
+                  contract={contract}
+                  item={deployments.find(
+                    (deployment) => deployment.network === "polygon-main"
+                  )}
+                  network="polygon"
+                  networkId="polygon"
+                  disabled={inDeploy}
+                  currentConnectedNetwork={networkId}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </main>
 
       <Footer />
