@@ -94,7 +94,9 @@ const DeployBox: FC<DeployBoxProps> = ({
     }
 
     // check is network currently user connected is the same as the network the project is going to deployed on
-    if (currentConnectedNetwork !== networkId) {
+    if (currentConnectedNetwork.toLowerCase() !== networkId) {
+      console.log("🚀 ~ file: DeployBox.tsx ~ line 98 ~ const_doDeploy= ~ networkId", networkId)
+      console.log("🚀 ~ file: DeployBox.tsx ~ line 98 ~ const_doDeploy= ~ currentConnectedNetwork", currentConnectedNetwork)
       setErrorInfo(`You are not connected to ${toHeaderCase(network)} network. Please switch your network.`);
       return;
     }
