@@ -272,7 +272,7 @@ const DeployBox: FC<DeployBoxProps> = ({
                 className="p-2 link text-sm underline hover:text-blue-300"
                 target="_blank"
               >
-                Download FJF
+                Download FJS
               </a>
             </Link>
           </div>
@@ -286,7 +286,12 @@ const DeployBox: FC<DeployBoxProps> = ({
         <div>
           {gasPrices && (
             <div className=" text-gray-400 text-sm pt-2 pb-2 mb-2">
-              <div>Deployment price: <span className="font-semibold">{getPriceHuman(networkId)}</span></div>
+              <div>
+                Deployment price:{" "}
+                <span className="font-semibold">
+                  {getPriceHuman(networkId)}
+                </span>
+              </div>
               <div>Current avg gas price: {gasPrices[networkId]} Gwei</div>
             </div>
           )}

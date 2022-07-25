@@ -22,6 +22,7 @@ import { chainIdToNetworkName, isNetworkSupported } from "../../lib/chainutils";
 import getConfig from "next/config";
 import imageLoader from "../../imageLoader";
 import Image from "next/image";
+import { formatError } from "../../lib/Utils";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -29,7 +30,7 @@ const CONTRACT_ABIS: any = {
   chainbox: contractAbiChainbox,
   rinkeby: contractAbiRinkeby,
   polygon: contractAbiPolygon,
-  ethereum: contractAbiEthereum
+  ethereum: contractAbiEthereum,
 };
 
 const Home: NextPage = () => {
@@ -220,15 +221,17 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     // get gas prices
-    fw.get("/v1/gas-prices").then((res: any) => {
-      console.log("🚀 ~ file: project.tsx ~ line 224 ~ fw.get ~ res", res)
-      if (res.result) {
-        setGasPrices(res.result.gasPrices);
-      }
-    }).catch((err: any) => {
-      console.error("[ERROR]", err);
-    })
-  }, [])
+    fw.get("/v1/gas-prices")
+      .then((res: any) => {
+        console.log("🚀 ~ file: project.tsx ~ line 224 ~ fw.get ~ res", res);
+        if (res.result) {
+          setGasPrices(res.result.gasPrices);
+        }
+      })
+      .catch((err: any) => {
+        console.error("[ERROR]", err);
+      });
+  }, []);
 
   // const doDeploy = async (network: string): Promise<any> => {
   //   setInDeploy(true);
@@ -287,6 +290,27 @@ const Home: NextPage = () => {
     }
   };
 
+  const downloadSrc = async () => {
+    fw.get(`/download-contract-src?projectId=${project._id}`)
+      .then((resp: any) => {
+        console.log("🚀 ~ file: DeployBox.tsx ~ line 221 ~ .then ~ resp", resp);
+        if (resp.error || resp.errors) {
+          console.error("[ERROR]", resp.error || resp.errors);
+          alert(formatError(resp.error || resp.errors));
+          return;
+        }
+        const { zipFileName } = resp.result;
+        window.open(
+          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project._id}/${zipFileName}`,
+          "_blank"
+        );
+      })
+      .catch((err) => {
+        console.log("🚀 ~ file: DeployBox.tsx ~ line 230 ~ .then ~ err", err);
+        alert("Error during downloading contract source");
+      });
+  };
+
   return (
     <div className={`pt-16 md:pt-0 flex flex-col items-center`}>
       <Head>
@@ -328,6 +352,13 @@ const Home: NextPage = () => {
                   <div>Max supply: {project.meta.maxSupply.toString()}</div>
                 )}
                 <div>ID: {project._id}</div>
+
+                <div
+                  className="mt-5 p-2 text-white cursor-pointer text-sm hover:text-blue-200 bg-cyan-500 w-60 text-center rounded-md"
+                  onClick={downloadSrc}
+                >
+                  Download contract source
+                </div>
               </div>
               <div className="mt-10">
                 <div className="mb-5">
