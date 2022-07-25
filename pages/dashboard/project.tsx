@@ -45,6 +45,7 @@ const Home: NextPage = () => {
   const [contractLoaded, setContractLoaded] = useState(false);
   const [networkId, setNetworkId] = useState<string | null>(null);
   const [image, setImage] = useState<any>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const links = [{ href: "/dashboard#projects", label: "Projects" }];
 
@@ -257,13 +258,17 @@ const Home: NextPage = () => {
   };
 
   const uploadImage = async (event: any) => {
-    if (!project){
+    if (!project) {
       return;
     }
     const body = new FormData();
     body.append("image", image);
     const resp = await fw.postRaw(`/v1/project/${project._id}/upload`, body);
     console.log("🚀 ~ file: project.tsx ~ line 251 ~ uploadImage ~ resp", resp);
+
+    if (resp.result) {
+      setImageUrl(resp.result.filename);
+    }
   };
 
   return (
@@ -331,13 +336,26 @@ const Home: NextPage = () => {
             <div className="w-2/3 pl-10 justify-end flex flex-col pb-2">
               {/* IMAGE ------------------------------ */}
 
-              <Image
-                src={`https://meta.chainbox.id/${project._id}/` + (project.meta.image ? project.meta.image : "default.png")}
-                alt="Project image"
-                loader={({ src }) => src}
-                width="200px"
-                height="300px"
-              />
+              {imageUrl ? (
+                <Image
+                  src={`https://meta.chainbox.id/${project._id}/${imageUrl}`}
+                  alt="Project image"
+                  loader={({ src }) => src}
+                  width="200px"
+                  height="300px"
+                />
+              ) : (
+                <Image
+                  src={
+                    `https://meta.chainbox.id/${project._id}/` +
+                    (project.meta.image ? project.meta.image : "default.png")
+                  }
+                  alt="Project image"
+                  loader={({ src }) => src}
+                  width="200px"
+                  height="300px"
+                />
+              )}
 
               <form
                 method="post"
