@@ -77,9 +77,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
                   <div
                     key={label}
                     onClick={(ev) => onClick && onClick()}
-                    className={`${
-                      isActive ? "underline" : ""
-                    } block mt-4 lg:inline-block lg:mt-0  mr-4 text-lg cursor-pointer`}
+                    className={`${isActive ? "underline" : ""} block mt-4 lg:inline-block lg:mt-0  mr-4 text-lg cursor-pointer`}
                   >
                     {label}
                   </div>
@@ -88,9 +86,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
                 return (
                   <Link href={href} passHref={true} key={label}>
                     <div
-                      className={`${
-                        isActive ? "underline" : ""
-                      } block mt-4 lg:inline-block lg:mt-0 mr-4 text-lg cursor-pointer`}
+                      className={`${isActive ? "underline" : ""} block mt-4 lg:inline-block lg:mt-0 mr-4 text-lg cursor-pointer`}
                     >
                       {label}
                     </div>
@@ -119,7 +115,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
 
           {currentAccount && (
             <div
-              className={`block mt-5 items-center  ml-5 lg:inline-block lg:mt-0 text-sm cursor-pointer`}
+              className="block mt-5 items-center  ml-5 lg:inline-block lg:mt-0 text-sm cursor-pointer"
               onClick={doLogout}
             >
               [logout]

@@ -31,6 +31,9 @@ export function ethRpcError(error: any) {
       return error.message;
     }
     case 4001: {
+      if (error.message){
+        return error.message;
+      }
       return "Transaction aborted";
     }
     default:

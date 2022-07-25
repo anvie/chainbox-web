@@ -1,26 +1,19 @@
 import type { NextPage } from "next";
-// import useSWR from "swr";
+
 import Head from "next/head";
-import styles from "../../styles/Home.module.sass";
 import Navbar from "../../components/Navbar";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
-import EligibilityChecker from "../../components/EligibilityChecker";
 import ConnectButton from "../../components/ConnectButton";
 import Web3 from "web3";
-import { Contract } from "web3-eth-contract";
-import { AbiItem } from "web3-utils";
-import { ethRpcError } from "../../lib/ErrorHandler";
 import detectEthereumProvider from "@metamask/detect-provider";
-import { Loading } from "../../components/Loading";
 import { useRouter } from "next/router";
 import fw from "../../lib/FetchWrapper";
 import { userAccess } from "../../lib/UserAccess";
-import { shortenAddress } from "../../lib/Utils";
 import ProjectsPage from "../../components/ProjectsPage";
 import ProfilePage from "../../components/ProfilePage";
-// import { UserContext } from "../../lib/UserContext";
 import { isNetworkSupported, supportedNetworks } from "../../lib/chainutils";
+import { ethRpcError } from "../../lib/ErrorHandler";
 
 const messageFormat =
   "Please sign this message to ensure you have right access to your wallet.";
@@ -34,16 +27,20 @@ const Home: NextPage = () => {
   const router = useRouter();
 
   const [currentAccount, setCurrentAccount] = useState<string | null>(null);
+  const [userAuthenticated, setUserAuthenticated] = useState(false);
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [errorInfo, setErrorInfo] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<string | null>(null);
   const [networkSupported, setNetworkSupported] = useState(true);
   const [noMetamask, setNoMetamask] = useState(false);
   const [page, setPage] = useState(0);
+  const [inSigning, setInSigning] = useState(false);
 
   const onAccountsChanged = (accs: any) => {
     console.log("onAccountsChanged", accs);
     if (accs.length === 0) {
-      setAccount(null);
+      setCurrentAccount(null);
+      // setAccount(null);
       return;
     }
     if (currentAccount !== accs[0]) {
@@ -53,10 +50,6 @@ const Home: NextPage = () => {
     setAccount(accs[0]);
   };
   const onNetworkChanged = async (network: any) => {
-    console.log(
-      "🚀 ~ file: index.tsx ~ line 74 ~ onNetworkChanged ~ network",
-      network
-    );
     if (network) {
       checkNetwork();
     }
@@ -143,27 +136,43 @@ const Home: NextPage = () => {
   }, [router, currentAccount]);
 
   const setAccount = async (acc: string | null) => {
+
     if (acc === null) {
       return;
     }
-    setCurrentAccount(acc);
+
+    setErrorInfo(null);
 
     // get token
 
     if (web3) {
-      const message = genMessageToSign(acc);
-      const signature = await web3.eth.personal.sign(message, acc, "");
+      setUserAuthenticated(false);
+      setInSigning(true);
+      setUserInfo("Please check your Metamask for signing request.")
 
-      fw.post("/v1/authenticate", {
-        address: acc,
-        signature,
-      }).then(({ error, result }) => {
-        if (error) {
-          console.log("error", error);
-          setErrorInfo(error.message);
-        }
-        userAccess.authenticate(acc!, result.token);
+      const message = genMessageToSign(acc);
+      web3.eth.personal.sign(message, acc, "", (error: any, signature: string) => {
+
+        fw.post("/v1/authenticate", {
+          address: acc,
+          signature,
+        }).then(({ error, result }) => {
+          if (error) {
+            console.log("error", error);
+            setErrorInfo(error.message);
+          }
+          setCurrentAccount(acc);
+          userAccess.authenticate(acc!, result.token);
+          setUserAuthenticated(true);
+        }).finally(() => {
+          setUserInfo(null);
+        });
+      }).catch((err: any) => {
+        setErrorInfo(ethRpcError(err));
+      }).finally(() => {
+        setInSigning(false);
       });
+
     }
   };
 
@@ -192,6 +201,12 @@ const Home: NextPage = () => {
           </div>
         )}
 
+        {userInfo && (
+          <div className="p-5 bg-blue-500 rounded-xl mb-10">
+            {userInfo}
+          </div>
+        )}
+
         {errorInfo && (
           <div className="p-5 bg-red-500 rounded-xl mb-10">
             ERROR: {errorInfo}
@@ -200,7 +215,7 @@ const Home: NextPage = () => {
 
         {/* {!currentAccount && <Loading className="p-10" />} */}
 
-        {!noMetamask && (
+        {(!noMetamask && !inSigning) && (
           <div>
             <ConnectButton
               setAccount={setAccount}
@@ -216,8 +231,8 @@ const Home: NextPage = () => {
           </div>
         )}
 
-        {(page == 0 && currentAccount && networkSupported) && <ProjectsPage />}
-        {(page == 1 && currentAccount && networkSupported) && <ProfilePage />}
+        {(page == 0 && userAuthenticated && networkSupported) && <ProjectsPage />}
+        {(page == 1 && userAuthenticated && networkSupported) && <ProfilePage />}
       </main>
 
       <Footer />
