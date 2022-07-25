@@ -76,14 +76,35 @@ const DeployBox: FC<DeployBoxProps> = ({
   // let _caption = isDeployed ? "Deployed" : "Deploy";
 
   useEffect(() => {
+    let iVal:NodeJS.Timer | null = null;
     if (inDeployment){
       // _disabled = true;
       setCaption("deploying...");
       setIsDisabled(true);
+
+      iVal = setInterval(() => {
+        fw.get(`/v1/project-status/${project._id}?network=${network}`).then(data => {
+          if (data && data.result){
+            setCaption("Deployed");
+            setItem(data.result);
+            if (iVal){
+              clearInterval(iVal)
+              iVal = null;
+            }
+          }
+        });
+      }, 5000);
     }else{
       // _disabled = false;
       setCaption("Deploy");
       setIsDisabled(false);
+    }
+
+    return ()=>{
+      if (iVal){
+        clearInterval(iVal);
+        iVal = null;
+      }
     }
   }, [inDeployment])
   
