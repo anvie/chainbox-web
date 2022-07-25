@@ -38,9 +38,9 @@ const ProjectItem: FC<ProjectItemProps> = ({ onClick, item }) => {
 
         <div className="text-sm">{item.description}</div>
 
-        <div className="text-sm text-center mt-10 bg-gray-300 w-20 rounded-md">
+        {/* <div className="text-sm text-center mt-10 bg-gray-300 w-20 rounded-md">
           {item.meta.deployed ? "deployed" : "draft"}
-        </div>
+        </div> */}
 
         <SmallButton
           caption="DETAIL"

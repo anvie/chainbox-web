@@ -266,7 +266,7 @@ const Home: NextPage = () => {
             <div className="mt-5">
               <p>{project.description}</p>
 
-              <div>Status: {project.deployed ? "DEPLOYED" : "DRAFT"}</div>
+              {/* <div>Status: {project.deployed ? "DEPLOYED" : "DRAFT"}</div> */}
               <div>Capped: {project.meta.capped.toString()}</div>
               <div>Max supply: {project.meta.maxSupply.toString()}</div>
               <div>ID: {project._id}</div>
