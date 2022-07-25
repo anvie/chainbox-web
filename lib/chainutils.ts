@@ -17,3 +17,19 @@ export function isNetworkSupported(chainId: number): boolean {
     chainId === 1919); // Chainbox (testnet)
 }
 
+export function chainIdToNetworkName(chainId: number): string {
+  switch (chainId) {
+    case 1:
+      return "Ethereum";
+    case 4:
+      return "Rinkeby";
+    case 137:
+      return "Polygon";
+    case 56:
+      return "BSC";
+    case 1919:
+      return "Chainbox";
+    default:
+      return "Unknown";
+  }
+}
