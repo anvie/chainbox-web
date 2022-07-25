@@ -21,9 +21,6 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="blur-dot-yellow" />
-      <div className="blur-dot-blue" />
-
       <UserContext.Provider value={{ address: "0x0" }}>
       <Navbar />
       </UserContext.Provider>
@@ -38,7 +35,7 @@ const Home: NextPage = () => {
 
       <footer className={styles.footer}>
         <div className="flex flex-col place-items-center items-center justify-center pt-10">
-          <div className="blur-dot-blue2 hidden md:block" />
+          {/* <div className="blur-dot-blue2 hidden md:block" /> */}
           <Image
             src="Chainbox-logo.png"
             alt="Chainbox Logo"

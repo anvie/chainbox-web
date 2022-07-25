@@ -77,7 +77,7 @@ class MyDocument extends Document {
           {/* --- Twitter Meta Tags ends --- */}
         </Head>
         <body>
-          <div className="bg1 w-full"></div>
+          {/* <div className="bg1 w-full"></div> */}
           {/* <div className="bg2 w-full"></div> */}
           <Main />
           <NextScript />

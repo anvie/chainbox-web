@@ -64,7 +64,7 @@ const ConnectButton: FC<Props> = ({
   ) : (
     <div
       onClick={onConnectButtonClick}
-      className={`flex pt-2 pb-2 pr-6 pl-5 space-x-2 rounded-xl w-56 items-center  ${
+      className={`flex pt-2 pb-2 pr-6 pl-5 space-x-2 rounded-xl w-56 items-center text-white  ${
         loading
           ? "bg-gray-700"
           : "bg-violet-600 hover:bg-violet-500 cursor-pointer"

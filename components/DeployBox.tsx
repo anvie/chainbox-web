@@ -176,9 +176,10 @@ const DeployBox: FC<DeployBoxProps> = ({
     // });
   };
 
+  const style:any = {"min-width": '500px'};
 
   return (
-    <div className="border p-2 text-center w-96">
+    <div className="border p-2 text-center w-96 text-white bg-gray-700 rounded-md" style={style}>
       <div className="mb-2">{toHeaderCase(network)}</div>
       {_item && (
         <div className="text-sm">

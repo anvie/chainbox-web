@@ -4,7 +4,7 @@ import imageLoader from "../imageLoader";
 
 const Section1 = () => {
   return (
-    <div id="about" className="section-2 w-full pl-5 pr-5 md:pl-20 md:pr-20 pt-10 pb-10 items-center justify-center content-center flex flex-col md:flex-row">
+    <div id="about" className="w-full pl-5 pr-5 md:pl-20 md:pr-20 pt-10 pb-10 items-center justify-center content-center flex flex-col md:flex-row">
       <div
         className={`${styles.overview} justify-center items-left flex flex-col`}
       >
@@ -14,10 +14,10 @@ const Section1 = () => {
         </div>
 
         <p className={`${styles.description} max-w-xl`}>
-        Chainbox is a tool to simplify the process of creating a Web3 project.
+        Chainbox is a tool to simplify the process of creating Web3 project.
         </p>
         <p className={`${styles.description} max-w-xl pt-2`}>
-        From creating smart contract, deploying into blockchain,
+        From generating smart contract, deploying into blockchain,
         and integrate with the web frontend.
         </p>
         <p className={`${styles.description} max-w-xl pt-2`}>

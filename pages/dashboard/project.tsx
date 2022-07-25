@@ -16,7 +16,7 @@ import DeployBox from "../../components/DeployBox";
 import contractAbiChainbox from "../../lib/ChainboxProxy-abi-chainbox.json";
 import contractAbiRinkeby from "../../lib/ChainboxProxy-abi-rinkeby.json";
 import contractAbiPolygon from "../../lib/ChainboxProxy-abi-polygon.json";
-import { isNetworkSupported } from "../../lib/chainutils";
+import { chainIdToNetworkName, isNetworkSupported } from "../../lib/chainutils";
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
@@ -73,19 +73,8 @@ const Home: NextPage = () => {
       return;
     }
     console.log("onNetworkChanged", chainId);
-    switch (chainId) {
-      case 1919:
-        setNetworkId("chainbox");
-        return;
-      case 4:
-        setNetworkId("rinkeby");
-        return;
-      case 137:
-        setNetworkId("polygon");
-        return;
-      default:
-        setNetworkSupported(isNetworkSupported(chainId));
-    }
+    setNetworkId(chainIdToNetworkName(chainId));
+    setNetworkSupported(isNetworkSupported(chainId));
   };
 
   useEffect(() => {
@@ -194,24 +183,25 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (web3 && networkSupported && networkId) {
+      const networkIdLower = networkId.toLowerCase();
       // const contractAddress = process.env.CHAINBOX_PROXY_CONTRACT;
       // if (!contractAddress) {
       //   throw Error("CHAINBOX_PROXY_CONTRACT is not defined");
       // }
       const contractAddress =
-        publicRuntimeConfig.proxyContractAddresses[networkId];
+        publicRuntimeConfig.proxyContractAddresses[networkIdLower];
       console.log("SC address:", contractAddress);
 
       if (contractAddress === "0x0000000000000000000000000000000000000000") {
         console.log(
-          "[WARN] Contract address is not defined for network " + networkId
+          "[WARN] Contract address is not defined for network " + networkIdLower
         );
         return;
       }
 
       setContract(
         new web3.eth.Contract(
-          CONTRACT_ABIS[networkId].abi as unknown as AbiItem,
+          CONTRACT_ABIS[networkIdLower].abi as unknown as AbiItem,
           contractAddress
         )
       );
@@ -263,7 +253,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="blur-dot-yellow" />
+      {/* <div className="blur-dot-yellow" /> */}
 
       <Navbar links={links} noDasboard={true} />
 

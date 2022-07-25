@@ -16,7 +16,7 @@ const Button: FC<Props> = ({ caption, color, textColor, loading, onClick }) => {
   
   return (
     <div
-      className={`p-2 text-white text-center border hover:shadow-xl cursor-pointer rounded-xl ${color} ${textColor}`}
+      className={`p-2 text-center border hover:shadow-xl cursor-pointer rounded-xl ${color} ${textColor}`}
       style={buttonStyle}
       onClick={(event) => onClick && onClick(event)}
     >

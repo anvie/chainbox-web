@@ -45,7 +45,7 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
   };
 
   return (
-    <nav className={`items-center justify-center flex-wrap p-6 hidden md:flex`}>
+    <nav className={`items-center justify-center flex-wrap p-5 w-full mb-5 hidden md:flex bg-slate-200`}>
       <div className="block md:hidden">
         <button className="flex items-center px-3 py-2 border rounded hover:text-white hover:border-white">
           <svg

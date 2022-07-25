@@ -74,6 +74,7 @@ const Home: NextPage = () => {
 
     if (userAccess.accessValue) {
       setCurrentAccount(userAccess.accessValue.ethAddress);
+      setUserAuthenticated(true);
     }
 
     checkNetwork();
@@ -152,6 +153,8 @@ const Home: NextPage = () => {
 
       const message = genMessageToSign(acc);
       web3.eth.personal.sign(message, acc, "", (error: any, signature: string) => {
+      console.log("🚀 ~ file: index.tsx ~ line 155 ~ web3.eth.personal.sign ~ error", error)
+      console.log("🚀 ~ file: index.tsx ~ line 155 ~ web3.eth.personal.sign ~ signature", signature)
 
         fw.post("/v1/authenticate", {
           address: acc,
@@ -187,8 +190,6 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="blur-dot-yellow" />
-
       <Navbar links={links} noDasboard={currentAccount != null} />
 
       <div id="modal-root"></div>
@@ -202,13 +203,13 @@ const Home: NextPage = () => {
         )}
 
         {userInfo && (
-          <div className="p-5 bg-blue-500 rounded-xl mb-10">
+          <div className="p-5 bg-blue-500 text-white rounded-xl mb-10">
             {userInfo}
           </div>
         )}
 
         {errorInfo && (
-          <div className="p-5 bg-red-500 rounded-xl mb-10">
+          <div className="p-5 bg-red-500 text-white rounded-xl mb-10">
             ERROR: {errorInfo}
           </div>
         )}
