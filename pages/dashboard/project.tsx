@@ -277,7 +277,7 @@ const Home: NextPage = () => {
                 <span className="font-semibold text-green-500">
                   {toHeaderCase(networkId || "Unknown")}
                 </span>
-                <span className="ml-2 text-sm">[{networkId && contract && publicRuntimeConfig.proxyContractAddresses && publicRuntimeConfig.proxyContractAddresses[networkId] }]</span>
+                <div className="text-sm">[SC: {networkId && contract && publicRuntimeConfig.proxyContractAddresses && publicRuntimeConfig.proxyContractAddresses[networkId.toLowerCase()] }]</div>
               </div>
               {(!project.deployed && web3 && contract && networkId) && (
                 <div className="flex flex-col space-y-5">

@@ -107,18 +107,22 @@ const Navbar: FC<Props> = ({ links, noDasboard }) => {
 
           {currentAccount && (
             <Link href="/dashboard#profile" passHref={true}>
-              <div className="block mt-5  lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-sm">
+              <div className="flex items-center text-center align-center">
+              <div className="block mt-5 lg:inline-block lg:mt-0 cursor-pointer text-transparent bg-clip-text bg-gradient-to-br from-orange-300 to-pink-600 text-sm">
                 {shortenAddress(currentAccount)}
+              </div>
               </div>
             </Link>
           )}
 
           {currentAccount && (
+            <div className="flex items-center text-center align-center">
             <div
               className="block mt-5 items-center  ml-5 lg:inline-block lg:mt-0 text-sm cursor-pointer"
               onClick={doLogout}
             >
               [logout]
+            </div>
             </div>
           )}
         </div>
