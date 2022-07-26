@@ -36,7 +36,7 @@ const ProjectItem: FC<ProjectItemProps> = ({ onClick, item }) => {
           {item.name}
         </div>
 
-        <div className="text-sm">{item.description}</div>
+        <div className="text-sm h-20 text-ellipsis overflow-hidden">{item.description}</div>
 
         {/* <div className="text-sm text-center mt-10 bg-gray-300 w-20 rounded-md">
           {item.meta.deployed ? "deployed" : "draft"}

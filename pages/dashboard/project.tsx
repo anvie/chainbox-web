@@ -311,27 +311,6 @@ const Home: NextPage = () => {
       });
   };
 
-  const downloadSji = async () => {
-    fw.get(`/generate-contract-sji?projectId=${project._id}`)
-      .then((resp: any) => {
-        console.log("🚀 ~ file: project.tsx ~ line 316 ~ .then ~ resp", resp)
-        if (resp.error || resp.errors) {
-          console.error("[ERROR]", resp.error || resp.errors);
-          alert(formatError(resp.error || resp.errors));
-          return;
-        }
-        const { file } = resp.result;
-        window.open(
-          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${file}`,
-          "_blank"
-        );
-      })
-      .catch((err) => {
-        console.log("🚀 ~ file: project.tsx ~ line 329 ~ downloadSji ~ err", err)
-        alert("Error during generating standard json input file");
-      });
-  };
-
   return (
     <div className={`pt-16 md:pt-0 flex flex-col items-center`}>
       <Head>
