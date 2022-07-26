@@ -12,6 +12,8 @@ import { userAccess } from "../lib/UserAccess";
 import { getPrice, getPriceHuman } from "../lib/pricing";
 import { watchTransaction } from "../lib/txutils";
 import { ethRpcError } from "../lib/ErrorHandler";
+import Image from "next/image";
+import imageLoader from "../imageLoader";
 
 const explorerUrl = (network: string) => {
   if (network === "chainbox") {
@@ -33,7 +35,6 @@ interface DeployBoxProps {
   item: any;
   network: string;
   networkId: string;
-  disabled: boolean;
   project: any;
   web3: Web3;
   contract: Contract;
@@ -46,7 +47,6 @@ const DeployBox: FC<DeployBoxProps> = ({
   item,
   network,
   networkId,
-  disabled,
   project,
   web3,
   contract,
@@ -290,6 +290,16 @@ const DeployBox: FC<DeployBoxProps> = ({
           </div>
 
           <div>
+          {project.meta.deployment && project.meta.deployment[networkId] && (
+            project.meta.deployment[networkId].codeVerification == 'Pass - Verified' &&
+              <div className="flex flex-row space-x-1 justify-center items-center p-2">
+                <Image src="checkmark-icon.svg" loader={imageLoader} width="15px" height="15px" alt="source code verified" />
+                <div>code verified</div>
+              </div>
+            )}
+          </div>
+
+          <div>
             <Link
               href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${_item.abiFile}`}
             >
@@ -302,7 +312,7 @@ const DeployBox: FC<DeployBoxProps> = ({
             </Link>
 
             <Link
-              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${project.meta.generated}-standard-input.json`}
+              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${toPascalCase(project.name)}-${project._id}-standard-input.json`}
             >
             <a
               className="p-2 link text-sm underline hover:text-blue-300"

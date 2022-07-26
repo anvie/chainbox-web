@@ -444,7 +444,6 @@ const Home: NextPage = () => {
                     )}
                     network="Chainbox [testnet]"
                     networkId="chainbox"
-                    disabled={inDeploy}
                     currentConnectedNetwork={networkId}
                     gasPrices={gasPrices}
                   />
@@ -457,7 +456,6 @@ const Home: NextPage = () => {
                     )}
                     network="Rinkeby [testnet]"
                     networkId="rinkeby"
-                    disabled={inDeploy}
                     currentConnectedNetwork={networkId}
                     gasPrices={gasPrices}
                   />
@@ -472,7 +470,6 @@ const Home: NextPage = () => {
                     )}
                     network="Ethereum"
                     networkId="ethereum"
-                    disabled={inDeploy}
                     currentConnectedNetwork={networkId}
                     gasPrices={gasPrices}
                   />
@@ -485,7 +482,6 @@ const Home: NextPage = () => {
                     )}
                     network="Polygon"
                     networkId="polygon"
-                    disabled={inDeploy}
                     currentConnectedNetwork={networkId}
                     gasPrices={gasPrices}
                   />
@@ -498,7 +494,6 @@ const Home: NextPage = () => {
                     )}
                     network="BSC"
                     networkId="bsc"
-                    disabled={inDeploy}
                     currentConnectedNetwork={networkId}
                     gasPrices={gasPrices}
                   />
