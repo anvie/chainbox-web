@@ -158,7 +158,9 @@ const DeployBox: FC<DeployBoxProps> = ({
       const sendData: any = {
         from: ethAddress,
         value: price,
-        gasLimit: web3.utils.toHex(610000),
+        gasPrice: web3.utils.toBN('1000000000').mul(web3.utils.toBN(parseInt(gasPrices[networkId]))),
+        gas: "2100000",
+        // gasLimit: web3.utils.toHex(610000),
         nonce: web3.utils.toHex(
           await web3.eth.getTransactionCount(ethAddress, "pending")
         ),
