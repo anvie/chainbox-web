@@ -93,7 +93,7 @@ const DeployBox: FC<DeployBoxProps> = ({
       setIsDisabled(true);
 
       iVal = setInterval(() => {
-        fw.get(`/v1/project-status/${project._id}?network=${network}`).then(
+        fw.get(`/v1/project-status/${project._id}?network=${networkId}`).then(
           (data) => {
             if (data && data.result) {
               setCaption("Deployed");
