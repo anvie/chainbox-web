@@ -360,24 +360,7 @@ const Home: NextPage = () => {
                   Download contract source
                 </div>
               </div>
-              <div className="mt-10">
-                <div className="mb-5">
-                  Current connected network:{" "}
-                  <span className="font-semibold text-green-500">
-                    {toHeaderCase(networkId || "Unknown")}
-                  </span>
-                  <div className="text-sm">
-                    [SC:{" "}
-                    {networkId &&
-                      contract &&
-                      publicRuntimeConfig.proxyContractAddresses &&
-                      publicRuntimeConfig.proxyContractAddresses[
-                        networkId.toLowerCase()
-                      ]}
-                    ]
-                  </div>
-                </div>
-              </div>
+              
             </div>
 
             <div className="w-2/3 pl-10 justify-end flex flex-col pb-2">
@@ -427,9 +410,29 @@ const Home: NextPage = () => {
         )}
 
         <div className="w-2/3">
+          
           {project && !project.deployed && web3 && contract && networkId && (
             <div>
               <div className="border"></div>
+
+              <div className="mt-5">
+                <div className="mb-5">
+                  Current connected network:{" "}
+                  <span className="font-semibold text-green-500">
+                    {toHeaderCase(networkId || "Unknown")}
+                  </span>
+                  <div className="text-sm">
+                    [SC:{" "}
+                    {networkId &&
+                      contract &&
+                      publicRuntimeConfig.proxyContractAddresses &&
+                      publicRuntimeConfig.proxyContractAddresses[
+                        networkId.toLowerCase()
+                      ]}
+                    ]
+                  </div>
+                </div>
+              </div>
               
               <div className="flex flex-col justify-center items-center">
               <div className="mb-5 mt-5 text-lg font-semibold">Deployments:</div>
