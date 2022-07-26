@@ -259,10 +259,10 @@ const DeployBox: FC<DeployBoxProps> = ({
       style={style}
     >
       <div className="mb-2">
-        <span>{toHeaderCase(network)}</span>
-        {["rinkeby", "chainbox"].includes(network) && (
+        <span>{network}</span>
+        {/* {["rinkeby", "chainbox"].includes(networkId) && (
           <span>&nbsp;[testnet]</span>
-        )}
+        )} */}
       </div>
       {_item && (
         <div className="text-sm">

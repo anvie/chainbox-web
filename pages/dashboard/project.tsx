@@ -430,73 +430,80 @@ const Home: NextPage = () => {
           {project && !project.deployed && web3 && contract && networkId && (
             <div>
               <div className="border"></div>
-              <div className="mb-5 mt-5">Deployments:</div>
-              <div className="flex flex-col space-y-5">
-                <DeployBox
-                  project={project}
-                  web3={web3}
-                  contract={contract}
-                  item={deployments.find(
-                    (deployment) => deployment.network === "chainbox"
-                  )}
-                  network="chainbox"
-                  networkId="chainbox"
-                  disabled={inDeploy}
-                  currentConnectedNetwork={networkId}
-                  gasPrices={gasPrices}
-                />
-                <DeployBox
-                  project={project}
-                  web3={web3}
-                  contract={contract}
-                  item={deployments.find(
-                    (deployment) => deployment.network === "rinkeby"
-                  )}
-                  network="rinkeby"
-                  networkId="rinkeby"
-                  disabled={inDeploy}
-                  currentConnectedNetwork={networkId}
-                  gasPrices={gasPrices}
-                />
-                <DeployBox
-                  project={project}
-                  web3={web3}
-                  contract={contract}
-                  item={deployments.find(
-                    (deployment) => deployment.network === "ethereum"
-                  )}
-                  network="ethereum"
-                  networkId="ethereum"
-                  disabled={inDeploy}
-                  currentConnectedNetwork={networkId}
-                  gasPrices={gasPrices}
-                />
-                <DeployBox
-                  project={project}
-                  web3={web3}
-                  contract={contract}
-                  item={deployments.find(
-                    (deployment) => deployment.network === "polygon"
-                  )}
-                  network="polygon"
-                  networkId="polygon"
-                  disabled={inDeploy}
-                  currentConnectedNetwork={networkId}
-                  gasPrices={gasPrices}
-                />
-                <DeployBox
-                  project={project}
-                  web3={web3}
-                  contract={contract}
-                  item={deployments.find(
-                    (deployment) => deployment.network === "bsc"
-                  )}
-                  network="bsc"
-                  networkId="bsc"
-                  disabled={inDeploy}
-                  currentConnectedNetwork={networkId}
-                  gasPrices={gasPrices}
-                />
+              
+              <div className="flex flex-col justify-center items-center">
+              <div className="mb-5 mt-5 text-lg font-semibold">Deployments:</div>
+              <div className="md:grid md:grid-cols-2 md:gap-10">
+                <div className="flex flex-col space-y-5">
+                  <DeployBox
+                    project={project}
+                    web3={web3}
+                    contract={contract}
+                    item={deployments.find(
+                      (deployment) => deployment.network === "chainbox"
+                    )}
+                    network="Chainbox [testnet]"
+                    networkId="chainbox"
+                    disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
+                    gasPrices={gasPrices}
+                  />
+                  <DeployBox
+                    project={project}
+                    web3={web3}
+                    contract={contract}
+                    item={deployments.find(
+                      (deployment) => deployment.network === "rinkeby"
+                    )}
+                    network="Rinkeby [testnet]"
+                    networkId="rinkeby"
+                    disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
+                    gasPrices={gasPrices}
+                  />
+                </div>
+                <div className="flex flex-col space-y-5 mt-5 md:mt-0">
+                  <DeployBox
+                    project={project}
+                    web3={web3}
+                    contract={contract}
+                    item={deployments.find(
+                      (deployment) => deployment.network === "ethereum"
+                    )}
+                    network="Ethereum"
+                    networkId="ethereum"
+                    disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
+                    gasPrices={gasPrices}
+                  />
+                  <DeployBox
+                    project={project}
+                    web3={web3}
+                    contract={contract}
+                    item={deployments.find(
+                      (deployment) => deployment.network === "polygon"
+                    )}
+                    network="Polygon"
+                    networkId="polygon"
+                    disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
+                    gasPrices={gasPrices}
+                  />
+                  <DeployBox
+                    project={project}
+                    web3={web3}
+                    contract={contract}
+                    item={deployments.find(
+                      (deployment) => deployment.network === "bsc"
+                    )}
+                    network="BSC"
+                    networkId="bsc"
+                    disabled={inDeploy}
+                    currentConnectedNetwork={networkId}
+                    gasPrices={gasPrices}
+                  />
+                </div>
+              </div>
               </div>
             </div>
           )}
