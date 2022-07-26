@@ -40,6 +40,7 @@ interface DeployBoxProps {
   contract: Contract;
   currentConnectedNetwork: string;
   gasPrices: any;
+  disabled?: boolean;
   // doDeploy: (network: string) => Promise<any>;
 }
 
@@ -52,6 +53,7 @@ const DeployBox: FC<DeployBoxProps> = ({
   contract,
   currentConnectedNetwork,
   gasPrices,
+  disabled
   // doDeploy,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -294,7 +296,7 @@ const DeployBox: FC<DeployBoxProps> = ({
             project.meta.deployment[networkId].codeVerification == 'Pass - Verified' &&
               <div className="flex flex-row space-x-1 justify-center items-center p-2">
                 <Image src="checkmark-icon.svg" loader={imageLoader} width="15px" height="15px" alt="source code verified" />
-                <div>code verified</div>
+                <div>Code verified</div>
               </div>
             )}
           </div>
@@ -346,7 +348,7 @@ const DeployBox: FC<DeployBoxProps> = ({
             color="bg-orange-600"
             onClick={_doDeploy}
             loading={loading}
-            disabled={isDisabled}
+            disabled={disabled || isDisabled}
           />
         </div>
       )}

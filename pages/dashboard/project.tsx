@@ -496,6 +496,7 @@ const Home: NextPage = () => {
                     networkId="bsc"
                     currentConnectedNetwork={networkId}
                     gasPrices={gasPrices}
+                    disabled={true}
                   />
                 </div>
               </div>
