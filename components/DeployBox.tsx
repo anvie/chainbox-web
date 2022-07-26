@@ -61,7 +61,7 @@ const DeployBox: FC<DeployBoxProps> = ({
   const [inDeployment, setInDeployment] = useState(false);
   const [caption, setCaption] = useState("Deploy");
   const [isDisabled, setIsDisabled] = useState(false);
-  const [inDownloadSji, setInDownloadSji] = useState(false);
+  // const [inDownloadSji, setInDownloadSji] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -220,36 +220,36 @@ const DeployBox: FC<DeployBoxProps> = ({
     // });
   };
 
-  const downloadSji = async () => {
-    if (inDownloadSji) {
-      return;
-    }
-    setInDownloadSji(true);
-    fw.get(`/generate-contract-sji?projectId=${project._id}`)
-      .then((resp: any) => {
-        console.log("🚀 ~ file: project.tsx ~ line 316 ~ .then ~ resp", resp);
-        if (resp.error || resp.errors) {
-          console.error("[ERROR]", resp.error || resp.errors);
-          alert(formatError(resp.error || resp.errors));
-          return;
-        }
-        const { file } = resp.result;
-        window.open(
-          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${file}`,
-          "_blank"
-        );
-      })
-      .catch((err) => {
-        console.log(
-          "🚀 ~ file: project.tsx ~ line 329 ~ downloadSji ~ err",
-          err
-        );
-        alert("Error during generating standard json input file");
-      })
-      .finally(() => {
-        setInDownloadSji(false);
-      });
-  };
+  // const downloadSji = async () => {
+  //   if (inDownloadSji) {
+  //     return;
+  //   }
+  //   setInDownloadSji(true);
+  //   fw.get(`/generate-contract-sji?projectId=${project._id}`)
+  //     .then((resp: any) => {
+  //       console.log("🚀 ~ file: project.tsx ~ line 316 ~ .then ~ resp", resp);
+  //       if (resp.error || resp.errors) {
+  //         console.error("[ERROR]", resp.error || resp.errors);
+  //         alert(formatError(resp.error || resp.errors));
+  //         return;
+  //       }
+  //       const { file } = resp.result;
+  //       window.open(
+  //         `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${file}`,
+  //         "_blank"
+  //       );
+  //     })
+  //     .catch((err) => {
+  //       console.log(
+  //         "🚀 ~ file: project.tsx ~ line 329 ~ downloadSji ~ err",
+  //         err
+  //       );
+  //       alert("Error during generating standard json input file");
+  //     })
+  //     .finally(() => {
+  //       setInDownloadSji(false);
+  //     });
+  // };
 
   const style: any = { minWidth: "400px" };
 
@@ -270,7 +270,7 @@ const DeployBox: FC<DeployBoxProps> = ({
             <div>Contract address:</div>
             <div>
               <Link
-                href={`${explorerUrl(network)}/address/${
+                href={`${explorerUrl(networkId)}/address/${
                   _item.contractAddress
                 }`}
               >
@@ -282,7 +282,7 @@ const DeployBox: FC<DeployBoxProps> = ({
           </div>
           <div>
             TX:&nbsp;
-            <Link href={`${explorerUrl(network)}/tx/${_item.txHash}`}>
+            <Link href={`${explorerUrl(networkId)}/tx/${_item.txHash}`}>
               <a target="_balnk" className="link hover:text-blue-300">
                 {shortenHash(_item.txHash)}
               </a>
@@ -301,12 +301,16 @@ const DeployBox: FC<DeployBoxProps> = ({
               </a>
             </Link>
 
-            <span
+            <Link
+              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${project.meta.generated}-standard-input.json`}
+            >
+            <a
               className="p-2 link text-sm underline hover:text-blue-300"
-              onClick={downloadSji}
+              target="_blank"
             >
               Download SJI
-            </span>
+            </a>
+            </Link>
           </div>
         </div>
       )}
