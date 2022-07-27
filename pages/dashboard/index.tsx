@@ -38,6 +38,10 @@ const Home: NextPage = () => {
 
   const onAccountsChanged = (accs: any) => {
     console.log("onAccountsChanged", accs);
+    console.log(
+      "🚀 ~ file: index.tsx ~ line 41 ~ onAccountsChanged ~ accs",
+      accs
+    );
     if (accs.length === 0) {
       setCurrentAccount(null);
       // setAccount(null);
@@ -57,7 +61,10 @@ const Home: NextPage = () => {
 
   const checkNetwork = () => {
     const chainId = parseInt((window.ethereum as any)?.chainId, 16);
-    console.log("🚀 ~ file: index.tsx ~ line 67 ~ checkNetwork ~ chainId", chainId)
+    console.log(
+      "🚀 ~ file: index.tsx ~ line 67 ~ checkNetwork ~ chainId",
+      chainId
+    );
     if (isNaN(chainId)) {
       return;
     }
@@ -87,7 +94,7 @@ const Home: NextPage = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [web3]);
 
   useEffect(() => {
     async function fetchData() {
@@ -137,6 +144,7 @@ const Home: NextPage = () => {
   }, [router, currentAccount]);
 
   const setAccount = async (acc: string | null) => {
+    console.log("🚀 ~ file: index.tsx ~ line 141 ~ setAccount ~ acc", acc);
 
     if (acc === null) {
       return;
@@ -146,37 +154,49 @@ const Home: NextPage = () => {
 
     // get token
 
-    if (web3) {
-      setUserAuthenticated(false);
-      setInSigning(true);
-      setUserInfo("Please check your Metamask for signing request.")
+    setUserAuthenticated(false);
+    setInSigning(true);
+    setUserInfo("Please check your Metamask for signing request.");
 
-      const message = genMessageToSign(acc);
-      web3.eth.personal.sign(message, acc, "", (error: any, signature: string) => {
-      console.log("🚀 ~ file: index.tsx ~ line 155 ~ web3.eth.personal.sign ~ error", error)
-      console.log("🚀 ~ file: index.tsx ~ line 155 ~ web3.eth.personal.sign ~ signature", signature)
+    const message = genMessageToSign(acc);
+    web3!.eth.personal
+      .sign(message, acc, "", (error: any, signature: string) => {
+        if (error){
+          console.log(
+            "🚀 ~ file: index.tsx ~ line 155 ~ web3.eth.personal.sign ~ error",
+            error
+          );
+          setErrorInfo(error.message);
+          return
+        }
+        console.log(
+          "🚀 ~ file: index.tsx ~ line 155 ~ web3.eth.personal.sign ~ signature",
+          signature
+        );
 
         fw.post("/v1/authenticate", {
           address: acc,
           signature,
-        }).then(({ error, result }) => {
-          if (error) {
-            console.log("error", error);
-            setErrorInfo(error.message);
-          }
-          setCurrentAccount(acc);
-          userAccess.authenticate(acc!, result.token);
-          setUserAuthenticated(true);
-        }).finally(() => {
-          setUserInfo(null);
-        });
-      }).catch((err: any) => {
+        })
+          .then(({ error, result }) => {
+            if (error) {
+              console.log("error", error);
+              setErrorInfo(error.message);
+            }
+            setCurrentAccount(acc);
+            userAccess.authenticate(acc!, result.token);
+            setUserAuthenticated(true);
+          })
+          .finally(() => {
+            setUserInfo(null);
+          });
+      })
+      .catch((err: any) => {
         setErrorInfo(ethRpcError(err));
-      }).finally(() => {
+      })
+      .finally(() => {
         setInSigning(false);
       });
-
-    }
   };
 
   return (
@@ -197,7 +217,9 @@ const Home: NextPage = () => {
       <main className={`flex flex-col w-2/3 justify-center items-center`}>
         {!networkSupported && (
           <div className="p-5 bg-orange-500 rounded-xl mb-10">
-            <div>Network not supported, please change to supported network:</div>
+            <div>
+              Network not supported, please change to supported network:
+            </div>
             <div>{supportedNetworks.join(", ")}</div>
           </div>
         )}
@@ -216,7 +238,7 @@ const Home: NextPage = () => {
 
         {/* {!currentAccount && <Loading className="p-10" />} */}
 
-        {(!noMetamask && !inSigning) && (
+        {!noMetamask && !inSigning && (
           <div>
             <ConnectButton
               setAccount={setAccount}
@@ -232,8 +254,8 @@ const Home: NextPage = () => {
           </div>
         )}
 
-        {(page == 0 && userAuthenticated && networkSupported) && <ProjectsPage />}
-        {(page == 1 && userAuthenticated && networkSupported) && <ProfilePage />}
+        {page == 0 && userAuthenticated && networkSupported && <ProjectsPage />}
+        {page == 1 && userAuthenticated && networkSupported && <ProfilePage />}
       </main>
 
       <Footer />

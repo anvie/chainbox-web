@@ -54,7 +54,7 @@ const ProfilePage = () => {
         </div>
         <div className="ml-10">{currentAccount}</div>
         <div className="ml-10">
-          Balance: <span className="font-semibold">{balance.substring(0,5)} {getSymbolFromNetworkId(networkId.toLowerCase())}</span>
+          Balance: <span className="font-semibold">{balance} {getSymbolFromNetworkId(networkId.toLowerCase())}</span>
         </div>
         <div className="ml-10">
           Network: <span className="font-semibold text-green-500">{networkId}</span>
