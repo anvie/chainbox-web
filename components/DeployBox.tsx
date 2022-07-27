@@ -53,7 +53,7 @@ const DeployBox: FC<DeployBoxProps> = ({
   contract,
   currentConnectedNetwork,
   gasPrices,
-  disabled
+  disabled,
   // doDeploy,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -63,7 +63,7 @@ const DeployBox: FC<DeployBoxProps> = ({
   const [inDeployment, setInDeployment] = useState(false);
   const [caption, setCaption] = useState("Deploy");
   const [isDisabled, setIsDisabled] = useState(false);
-  // const [inDownloadSji, setInDownloadSji] = useState(false);
+  const [inDownloadSdk, setInDownloadSdk] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -158,7 +158,9 @@ const DeployBox: FC<DeployBoxProps> = ({
       const sendData: any = {
         from: ethAddress,
         value: price,
-        gasPrice: web3.utils.toBN('1000000000').mul(web3.utils.toBN(parseInt(gasPrices[networkId]))),
+        gasPrice: web3.utils
+          .toBN("1000000000")
+          .mul(web3.utils.toBN(parseInt(gasPrices[networkId]))),
         gas: "2100000",
         // gasLimit: web3.utils.toHex(610000),
         nonce: web3.utils.toHex(
@@ -224,36 +226,38 @@ const DeployBox: FC<DeployBoxProps> = ({
     // });
   };
 
-  // const downloadSji = async () => {
-  //   if (inDownloadSji) {
-  //     return;
-  //   }
-  //   setInDownloadSji(true);
-  //   fw.get(`/generate-contract-sji?projectId=${project._id}`)
-  //     .then((resp: any) => {
-  //       console.log("🚀 ~ file: project.tsx ~ line 316 ~ .then ~ resp", resp);
-  //       if (resp.error || resp.errors) {
-  //         console.error("[ERROR]", resp.error || resp.errors);
-  //         alert(formatError(resp.error || resp.errors));
-  //         return;
-  //       }
-  //       const { file } = resp.result;
-  //       window.open(
-  //         `${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${file}`,
-  //         "_blank"
-  //       );
-  //     })
-  //     .catch((err) => {
-  //       console.log(
-  //         "🚀 ~ file: project.tsx ~ line 329 ~ downloadSji ~ err",
-  //         err
-  //       );
-  //       alert("Error during generating standard json input file");
-  //     })
-  //     .finally(() => {
-  //       setInDownloadSji(false);
-  //     });
-  // };
+  const downloadSdk = async () => {
+    if (inDownloadSdk) {
+      return;
+    }
+    setInDownloadSdk(true);
+    fw.get(
+      `/download-sdk?projectId=${project._id}&networkId=${networkId}&contract=${_item.contractAddress}`
+    )
+      .then((resp: any) => {
+        console.log("🚀 ~ file: project.tsx ~ line 316 ~ .then ~ resp", resp);
+        if (resp.error || resp.errors) {
+          console.error("[ERROR]", resp.error || resp.errors);
+          alert(formatError(resp.error || resp.errors));
+          return;
+        }
+        const file = resp.result;
+        window.open(
+          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${file}`,
+          "_blank"
+        );
+      })
+      .catch((err) => {
+        console.log(
+          "🚀 ~ file: DeployBox.tsx ~ line 247 ~ downloadSdk ~ err",
+          err
+        );
+        alert("Error during generating sdk");
+      })
+      .finally(() => {
+        setInDownloadSdk(false);
+      });
+  };
 
   const style: any = { minWidth: "400px" };
 
@@ -294,13 +298,21 @@ const DeployBox: FC<DeployBoxProps> = ({
           </div>
 
           <div>
-          {project.meta.deployment && project.meta.deployment[networkId] && (
-            project.meta.deployment[networkId].codeVerification == 'Pass - Verified' &&
-              <div className="flex flex-row space-x-1 justify-center items-center p-2">
-                <Image src="checkmark-icon.svg" loader={imageLoader} width="15px" height="15px" alt="source code verified" />
-                <div>Code verified</div>
-              </div>
-            )}
+            {project.meta.deployment &&
+              project.meta.deployment[networkId] &&
+              project.meta.deployment[networkId].codeVerification ==
+                "Pass - Verified" && (
+                <div className="flex flex-row space-x-1 justify-center items-center p-2">
+                  <Image
+                    src="checkmark-icon.svg"
+                    loader={imageLoader}
+                    width="15px"
+                    height="15px"
+                    alt="source code verified"
+                  />
+                  <div>Code verified</div>
+                </div>
+              )}
           </div>
 
           <div>
@@ -316,15 +328,26 @@ const DeployBox: FC<DeployBoxProps> = ({
             </Link>
 
             <Link
-              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${project.meta.generated}/${toPascalCase(project.name)}-${project._id}-standard-input.json`}
+              href={`${process.env.BASE_URL_PROJECT_DATA_DIR}/${
+                project.meta.generated
+              }/${toPascalCase(project.name)}-${
+                project._id
+              }-standard-input.json`}
             >
-            <a
-              className="p-2 link text-sm underline hover:text-blue-300"
-              target="_blank"
-            >
-              Download SJI
-            </a>
+              <a
+                className="p-2 link text-sm underline hover:text-blue-300"
+                target="_blank"
+              >
+                Download SJI
+              </a>
             </Link>
+
+            <div
+              className="p-2 link text-sm underline hover:text-blue-300"
+              onClick={downloadSdk}
+            >
+              Download SDK
+            </div>
           </div>
         </div>
       )}
