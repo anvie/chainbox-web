@@ -232,7 +232,7 @@ const DeployBox: FC<DeployBoxProps> = ({
     }
     setInDownloadSdk(true);
     fw.get(
-      `/download-sdk?projectId=${project._id}&networkId=${networkId}&contract=${_item.contractAddress}`
+      `/download-sdk?projectId=${project._id}&networkId=${networkId}&contract=${_item.contractAddress}&ts=${new Date().getTime()}`
     )
       .then((resp: any) => {
         console.log("🚀 ~ file: project.tsx ~ line 316 ~ .then ~ resp", resp);
@@ -243,7 +243,7 @@ const DeployBox: FC<DeployBoxProps> = ({
         }
         const file = resp.result;
         window.open(
-          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${file}`,
+          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${file}?ts=${new Date().getTime()}`,
           "_blank"
         );
       })
