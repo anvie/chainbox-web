@@ -8,7 +8,7 @@ import ProjectItem, { ItemProps } from "./ProjectItem";
 import { userAccess } from "../lib/UserAccess";
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
-import { chainIdToNetworkName } from "../lib/chainutils";
+import { chainIdToNetworkName, getSymbol, getSymbolFromNetworkId } from "../lib/chainutils";
 
 const ProfilePage = () => {
   const currentAccount = userAccess.accessValue?.ethAddress;
@@ -54,7 +54,7 @@ const ProfilePage = () => {
         </div>
         <div className="ml-10">{currentAccount}</div>
         <div className="ml-10">
-          Balance: <span className="font-semibold">{balance} ETH</span>
+          Balance: <span className="font-semibold">{balance.substring(0,5)} {getSymbolFromNetworkId(networkId.toLowerCase())}</span>
         </div>
         <div className="ml-10">
           Network: <span className="font-semibold text-green-500">{networkId}</span>
