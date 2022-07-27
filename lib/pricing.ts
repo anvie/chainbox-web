@@ -11,7 +11,7 @@ export function getPrice(networkId: string): string {
     case "ethereum": // Ethereum
       return Web3.utils.toWei("0.15", "ether");
     case "polygon":
-      return Web3.utils.toWei("0.2", "ether");
+      return Web3.utils.toWei("0.5", "ether");
     case "bsc":
       return Web3.utils.toWei("0.1", "ether");
   }
