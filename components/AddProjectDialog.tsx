@@ -30,6 +30,11 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
     const authorEmail = event.target.authorEmail.value;
     const kind = event.target.kind.value;
     const capped = event.target.capped.checked;
+    const free = event.target.free.checked;
+    const payToMint = event.target.payToMint.checked;
+    const mintPrice = event.target.mintPrice.value;
+    const withWhitelist = event.target.withWhitelist.checked;
+
     console.log(
       "🚀 ~ file: AddProjectDialog.tsx ~ line 31 ~ onSubmit ~ capped",
       capped
@@ -46,6 +51,7 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
       kind,
       capped,
       maxSupply,
+      free, payToMint, mintPrice, withWhitelist
     })
       .then((resp) => {
         if (resp.result) {
@@ -199,12 +205,12 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
               </div>
               <div className="flex items-center">
                 <input
-                  id="whitelist"
+                  id="withWhitelist"
                   type="checkbox"
                   value="false"
                   className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
-                <label htmlFor="whitelist" className="ml-2 italic">
+                <label htmlFor="withWhitelist" className="ml-2 italic">
                   Whitelist
                 </label>
               </div>
@@ -218,8 +224,8 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
                 id="mintPrice"
                 name="mintPrice"
                 type="number"
-                autoComplete="days"
-                min="0"
+                step="0.01"
+                autoComplete="price"
                 defaultValue="0"
               />
             </div>
