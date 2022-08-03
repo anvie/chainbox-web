@@ -131,7 +131,7 @@ const DeployBox: FC<DeployBoxProps> = ({
     // @TODO(*): set constructorArgs as user input
     // const constructorArgs = [baseTokenUri, owner, admin];
     const constructorArgs:any[] = [
-      "https://meta.example.com",
+      `https://meta.chainbox.id/${projectId}/`,
       sender,
       sender
     ];
