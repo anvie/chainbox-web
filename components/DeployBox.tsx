@@ -122,6 +122,29 @@ const DeployBox: FC<DeployBoxProps> = ({
     };
   }, [inDeployment]);
 
+  // Get signature from server
+  const getSignature = async (
+    sender: string,
+    projectId: string,
+    networkId: string
+  ): Promise<any> => {
+    // @TODO(*): set constructorArgs as user input
+    // const constructorArgs = [baseTokenUri, owner, admin];
+    const constructorArgs:any[] = [
+      "https://meta.example.com",
+      sender,
+      sender
+    ];
+    return fw
+      .post(`/v1/prepare-deploy`, { projectId, networkId, constructorArgs })
+      .then((data) => {
+        if (data && data.result) {
+          return data.result.signature;
+        }
+        throw Error("Cannot get signature");
+      });
+  };
+
   const _doDeploy = async (): Promise<any> => {
     if (isDisabled) {
       return;
@@ -155,6 +178,11 @@ const DeployBox: FC<DeployBoxProps> = ({
     if (contract && web3 && ethAddress) {
       console.log("ethAddress:", ethAddress);
       console.log("price:", price);
+
+      // get signature from server
+      const signature = await getSignature(ethAddress, project._id, networkId);
+      console.log("🚀 ~ file: DeployBox.tsx ~ line 177 ~ const_doDeploy= ~ signature", signature)
+
       const sendData: any = {
         from: ethAddress,
         value: price,
@@ -180,7 +208,7 @@ const DeployBox: FC<DeployBoxProps> = ({
       // setWaitMetamask(true);
 
       contract.methods
-        .deployPayment(web3.utils.toBN(project._id))
+        .deployPayment(web3.utils.toBN(project._id), signature)
         .send(sendData)
         .then((_tx: any) => {
           console.log(_tx);
@@ -190,7 +218,7 @@ const DeployBox: FC<DeployBoxProps> = ({
         })
         .catch((err: any) => {
           setErrorInfo(ethRpcError(err));
-          setTimeout(() => setErrorInfo(null), 2000);
+          setTimeout(() => setErrorInfo(null), 5000);
           setInDeployment(false);
           // alert(ethRpcError(err))
         })
@@ -232,7 +260,9 @@ const DeployBox: FC<DeployBoxProps> = ({
     }
     setInDownloadSdk(true);
     fw.get(
-      `/download-sdk?projectId=${project._id}&networkId=${networkId}&contract=${_item.contractAddress}&ts=${new Date().getTime()}`
+      `/download-sdk?projectId=${project._id}&networkId=${networkId}&contract=${
+        _item.contractAddress
+      }&ts=${new Date().getTime()}`
     )
       .then((resp: any) => {
         console.log("🚀 ~ file: project.tsx ~ line 316 ~ .then ~ resp", resp);
@@ -243,7 +273,9 @@ const DeployBox: FC<DeployBoxProps> = ({
         }
         const file = resp.result;
         window.open(
-          `${process.env.BASE_URL_PROJECT_DATA_DIR}/${file}?ts=${new Date().getTime()}`,
+          `${
+            process.env.BASE_URL_PROJECT_DATA_DIR
+          }/${file}?ts=${new Date().getTime()}`,
           "_blank"
         );
       })

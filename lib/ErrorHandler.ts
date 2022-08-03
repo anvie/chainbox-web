@@ -23,6 +23,8 @@ export function ethRpcError(error: any) {
         );
         if (ret && ret.length > 1) {
           return ret[1];
+        }else{
+          return "Failed: transaction reverted :(";
         }
       }
       return error.message;
