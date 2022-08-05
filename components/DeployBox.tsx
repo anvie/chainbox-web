@@ -234,30 +234,6 @@ const DeployBox: FC<DeployBoxProps> = ({
           setLoading(false);
         });
     }
-
-    // return new Promise((resolve, reject) => {
-    //   setLoading(true);
-    //   fw.post(`/v1/deploy`, {
-    //     projectId: project._id,
-    //     network: network.toLowerCase(),
-    //   })
-    //     .then((resp:any) => {
-    //       if (resp.error || resp.errors) {
-    //         console.error("[ERROR]", resp.error || resp.errors);
-    //         alert(formatError(resp.error || resp.errors));
-    //         // setInDeploy(false);
-    //         reject(resp.error || resp.errors);
-    //       }
-    //       // setInDeploy(false);
-    //       setItem(resp.result);
-    //       resolve(resp.result);
-    //     })
-    //     .catch((err) => {
-    //       reject(err);
-    //     }).finally(() => {
-    //       setLoading(false);
-    //     });
-    // });
   };
 
   const downloadSdk = async () => {

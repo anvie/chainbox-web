@@ -48,6 +48,11 @@ const DeployDialog: FC<Props> = ({ show, projectId, onDeploy, onClose }) => {
       return event.target[param.name].value;
     });
     onDeploy(constructorArgs);
+    onClose();
+  }
+
+  const _isNumeric = (ty:string) => {
+    return ["int", "uint", "uint8", "uint16", "uint32", "uint64", "uint128", "uint256"].includes(ty);
   }
 
   return (
@@ -69,11 +74,11 @@ const DeployDialog: FC<Props> = ({ show, projectId, onDeploy, onClose }) => {
                 required
                 pattern="0x[a-fA-F0-9]{40}"
               /> }
-              {param.type == "number" && <input
+              {_isNumeric(param.type) && <input
                 className="mb-4 border-b-2 p-2 w-full"
                 id={param.name}
                 name={param.name}
-                type="numeric"
+                type="number"
                 defaultValue={_defaultValues[param.name] || ''}
                 placeholder={param.type}
                 required
