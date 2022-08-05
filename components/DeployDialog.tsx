@@ -56,7 +56,7 @@ const DeployDialog: FC<Props> = ({ show, projectId, onDeploy, onClose }) => {
   }
 
   return (
-    <Modal show={show} title="Deployment config" onClose={_onClose}>
+    <Modal show={show} title="Constructor parameters" onClose={_onClose}>
       <form className="flex flex-col w-full" onSubmit={_onDeploy}>
         {parameters.map((param) => {
           return (
