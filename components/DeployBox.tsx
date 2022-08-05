@@ -15,6 +15,7 @@ import { ethRpcError } from "../lib/ErrorHandler";
 import Image from "next/image";
 import imageLoader from "../imageLoader";
 import DeployDialog from "./DeployDialog";
+import Project from "../lib/types/Project";
 
 const explorerUrl = (network: string) => {
   if (network === "chainbox") {
@@ -36,7 +37,7 @@ interface DeployBoxProps {
   item: any;
   network: string;
   networkId: string;
-  project: any;
+  project: Project;
   web3: Web3;
   contract: Contract;
   currentConnectedNetwork: string;
@@ -394,7 +395,7 @@ const DeployBox: FC<DeployBoxProps> = ({
 
       { showDeployDialog && <DeployDialog
         show={showDeployDialog}
-        projectId={project._id}
+        project={project}
         onDeploy={_doDeploy}
         onClose={() => setShowDeployDialog(false)}
       />}

@@ -23,6 +23,7 @@ import getConfig from "next/config";
 import imageLoader from "../../imageLoader";
 import Image from "next/image";
 import { formatError } from "../../lib/Utils";
+import Project from "../../lib/types/Project";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -37,7 +38,7 @@ const Home: NextPage = () => {
   const router = useRouter();
 
   const [currentAccount, setCurrentAccount] = useState<string | null>(null);
-  const [project, setProject] = useState<any | null>(null);
+  const [project, setProject] = useState<Project | null>(null);
   const [deployments, setDeployments] = useState<any[]>([]);
   const [inDeploy, setInDeploy] = useState(false);
   const [errorInfo, setErrorInfo] = useState<string | null>(null);
@@ -291,6 +292,10 @@ const Home: NextPage = () => {
   };
 
   const downloadSrc = async () => {
+    if (!project) {
+      console.log("!project");
+      return;
+    }
     fw.get(`/download-contract-src?projectId=${project._id}`)
       .then((resp: any) => {
         console.log("🚀 ~ file: DeployBox.tsx ~ line 221 ~ .then ~ resp", resp);
@@ -411,7 +416,7 @@ const Home: NextPage = () => {
 
         <div className="w-2/3">
           
-          {project && !project.deployed && web3 && contract && networkId && (
+          {project && web3 && contract && networkId && (
             <div>
               <div className="border"></div>
 

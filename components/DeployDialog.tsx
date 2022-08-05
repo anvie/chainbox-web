@@ -2,19 +2,21 @@ import { FC, useCallback, useEffect, useState } from "react";
 import Modal from "./Modal";
 import fw from "../lib/FetchWrapper";
 import Button from "./Button";
+import Project from "../lib/types/Project";
 
 interface Props {
   show: boolean;
-  projectId: string;
+  project: Project;
   onDeploy: (args:string[]) => void;
   onClose: () => void;
 }
 
-const DeployDialog: FC<Props> = ({ show, projectId, onDeploy, onClose }) => {
+const DeployDialog: FC<Props> = ({ show, project, onDeploy, onClose }) => {
   const [parameters, setParameters] = useState<any[]>([]);
 
   const _defaultValues:any = {
-    _baseTokenURI: `https://meta.chainbox.id/${projectId}/`,
+    _baseTokenURI: `https://meta.chainbox.id/${project._id}/`,
+    owner: project.owner
   };
 
   const _onClose = () => {
@@ -22,7 +24,7 @@ const DeployDialog: FC<Props> = ({ show, projectId, onDeploy, onClose }) => {
   };
 
   const _fetchParameters = useCallback(async () => {
-    fw.get(`/v1/project/${projectId}/constructor-args`)
+    fw.get(`/v1/project/${project._id}/constructor-args`)
       .then((data) => {
         console.log(
           "🚀 ~ file: DeployDialog.tsx ~ line 21 ~ fw.get ~ data",
@@ -36,7 +38,7 @@ const DeployDialog: FC<Props> = ({ show, projectId, onDeploy, onClose }) => {
           err
         );
       });
-  }, [projectId]);
+  }, [project._id]);
 
   useEffect(() => {
     _fetchParameters();
