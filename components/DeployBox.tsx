@@ -14,6 +14,7 @@ import { watchTransaction } from "../lib/txutils";
 import { ethRpcError } from "../lib/ErrorHandler";
 import Image from "next/image";
 import imageLoader from "../imageLoader";
+import DeployDialog from "./DeployDialog";
 
 const explorerUrl = (network: string) => {
   if (network === "chainbox") {
@@ -64,6 +65,7 @@ const DeployBox: FC<DeployBoxProps> = ({
   const [caption, setCaption] = useState("Deploy");
   const [isDisabled, setIsDisabled] = useState(false);
   const [inDownloadSdk, setInDownloadSdk] = useState(false);
+  const [showDeployDialog, setShowDeployDialog] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -126,15 +128,16 @@ const DeployBox: FC<DeployBoxProps> = ({
   const getSignature = async (
     sender: string,
     projectId: string,
-    networkId: string
+    networkId: string,
+    constructorArgs: any[]
   ): Promise<any> => {
     // @TODO(*): set constructorArgs as user input
     // const constructorArgs = [baseTokenUri, owner, admin];
-    const constructorArgs:any[] = [
-      `https://meta.chainbox.id/${projectId}/`,
-      sender,
-      sender
-    ];
+    // const constructorArgs: any[] = [
+    //   `https://meta.chainbox.id/${projectId}/`,
+    //   sender,
+    //   sender,
+    // ];
     return fw
       .post(`/v1/prepare-deploy`, { projectId, networkId, constructorArgs })
       .then((data) => {
@@ -145,7 +148,7 @@ const DeployBox: FC<DeployBoxProps> = ({
       });
   };
 
-  const _doDeploy = async (): Promise<any> => {
+  const _doDeploy = async (constructorArgs: string[]): Promise<any> => {
     if (isDisabled) {
       return;
     }
@@ -180,8 +183,11 @@ const DeployBox: FC<DeployBoxProps> = ({
       console.log("price:", price);
 
       // get signature from server
-      const signature = await getSignature(ethAddress, project._id, networkId);
-      console.log("🚀 ~ file: DeployBox.tsx ~ line 177 ~ const_doDeploy= ~ signature", signature)
+      const signature = await getSignature(ethAddress, project._id, networkId, constructorArgs);
+      console.log(
+        "🚀 ~ file: DeployBox.tsx ~ line 177 ~ const_doDeploy= ~ signature",
+        signature
+      );
 
       const sendData: any = {
         from: ethAddress,
@@ -403,12 +409,19 @@ const DeployBox: FC<DeployBoxProps> = ({
           <SmallButton
             caption={caption}
             color="bg-orange-600"
-            onClick={_doDeploy}
+            onClick={() => setShowDeployDialog(true)}
             loading={loading}
             disabled={disabled || isDisabled}
           />
         </div>
       )}
+
+      { showDeployDialog && <DeployDialog
+        show={showDeployDialog}
+        projectId={project._id}
+        onDeploy={_doDeploy}
+        onClose={() => setShowDeployDialog(false)}
+      />}
     </div>
   );
 };
