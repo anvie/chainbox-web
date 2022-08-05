@@ -18,7 +18,7 @@ const nextConfig = {
   },
   publicRuntimeConfig: {
     proxyContractAddresses: {
-      'chainbox': '0xDf1cA7Ba3C50336271df3882537937e3D2E1D0D0', // v2
+      'chainbox': '0xDe599c4cd9e2F055ac7281410c8209e22e214E96', // v3
       'rinkeby': '0x757b3F16eF32D97fDEea8bA442823eD4c76926A6',
       'ethereum': '0x5adf2C010e960d475679FA9Bb178B3FD4CbE4d1c',
       'polygon': '0x757b3F16eF32D97fDEea8bA442823eD4c76926A6',

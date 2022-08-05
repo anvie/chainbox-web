@@ -9,7 +9,7 @@
     "lint": "next lint",
     "compile-deps": "cd listener && yarn compile-deps",
     "sync": "yarn sync-abi",
-    "sync-abi": "cp ../chainbox-contract/build/contracts/ChainboxProxy.json ./lib/ChainboxProxy-ABI.json"
+    "sync-abi": "cp ../chainbox-contract/build/contracts/ChainboxProxy.json ./lib/ChainboxProxy-abi.json"
   },
   "dependencies": {
     "@metamask/detect-provider": "^1.2.0",
