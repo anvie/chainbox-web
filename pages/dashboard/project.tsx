@@ -24,6 +24,7 @@ import imageLoader from "../../imageLoader";
 import Image from "next/image";
 import { formatError } from "../../lib/Utils";
 import Project from "../../lib/types/Project";
+import { ethRpcError } from "../../lib/ErrorHandler";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -46,12 +47,14 @@ const Home: NextPage = () => {
   const [loaded, setLoaded] = useState(false);
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [networkSupported, setNetworkSupported] = useState(true);
-  const [contract, setContract] = useState<Contract | null>(null);
-  const [contractLoaded, setContractLoaded] = useState(false);
+  const [proxyContract, setProxyContract] = useState<Contract | null>(null);
+  const [proxyContractLoaded, setProxyContractLoaded] = useState(false);
+  const [projectContract, setProjectContract] = useState<Contract | null>(null);
   const [networkId, setNetworkId] = useState<string | null>(null);
   const [image, setImage] = useState<any>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [gasPrices, setGasPrices] = useState<any>(null);
+  const [baseTokenURI, setBaseTokenURI] = useState<string>("");
 
   const links = [{ href: "/dashboard#projects", label: "Projects" }];
 
@@ -194,10 +197,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     if (web3 && networkSupported && networkId) {
       const networkIdLower = networkId.toLowerCase();
-      // const contractAddress = process.env.CHAINBOX_PROXY_CONTRACT;
-      // if (!contractAddress) {
-      //   throw Error("CHAINBOX_PROXY_CONTRACT is not defined");
-      // }
+
       const contractAddress =
         publicRuntimeConfig.proxyContractAddresses[networkIdLower];
       console.log("SC address:", contractAddress);
@@ -209,16 +209,51 @@ const Home: NextPage = () => {
         return;
       }
 
-      setContract(
-        new web3.eth.Contract(
-          CONTRACT_ABIS[networkIdLower].abi as unknown as AbiItem,
-          contractAddress
-        )
+      const _contract = new web3.eth.Contract(
+        CONTRACT_ABIS[networkIdLower].abi as unknown as AbiItem,
+        contractAddress
       );
-      console.log("contract loaded");
-      setContractLoaded(true);
+      setProxyContract(_contract);
+      // _contract.methods.baseTokenURI().call((err:any, res:string) => {
+      //   console.log("🚀 ~ file: project.tsx ~ line 217 ~ _contract.methods.baseTokenURI.call ~ res", res)
+      //   setBaseTokenURI(res);
+      // })
+      console.log("proxy contract loaded");
+      setProxyContractLoaded(true);
     }
   }, [web3, networkSupported, networkId]);
+
+  // effect to handle get base token uri
+  // from project's contract
+  useEffect(() => {
+    if (project && deployments) {
+      const networkIdLower = "chainbox"; // should not be hard coded
+      // find contract address from deploymnent
+      const contractAddress = deployments.find(
+        (d: any) => d.network === networkIdLower
+      )?.contractAddress;
+      if (!contractAddress) {
+        console.log(
+          "[WARN] Contract address is not defined for network " + networkIdLower
+        );
+        return;
+      }
+      const chainboxContractAbiMin =
+        require("../../lib/Chainbox-contract-abi-minimal.json").abi;
+      const _contract = new web3!.eth.Contract(
+        chainboxContractAbiMin as unknown as AbiItem,
+        contractAddress
+      );
+      _contract.methods.baseTokenURI().call((err: any, res: string) => {
+        console.log(
+          "🚀 ~ file: project.tsx ~ line 242 ~ _contract.methods.baseTokenURI ~ res",
+          res
+        );
+        setBaseTokenURI(res);
+      });
+      setProjectContract(_contract);
+    }
+  }, [project, deployments]);
 
   useEffect(() => {
     // get gas prices
@@ -316,6 +351,27 @@ const Home: NextPage = () => {
       });
   };
 
+  const updateMetadataBaseUri = async (e: any) => {
+    e.preventDefault();
+    if (projectContract && project) {
+      const _baseTokenURI = e.target.baseTokenURI.value;
+      
+      const owner = await projectContract.methods.owner().call();
+      console.log("🚀 ~ file: project.tsx ~ line 360 ~ updateMetadataBaseUri ~ owner", owner)
+
+      const tx = await projectContract.methods
+        .setBaseURI(_baseTokenURI)
+        .send({ from: owner })
+        .catch((err: any) => {
+          alert(ethRpcError(err));
+        });
+      console.log(
+        "🚀 ~ file: project.tsx ~ line 264 ~ updateMetadataBaseUri ~ tx",
+        tx
+      );
+    }
+  };
+
   return (
     <div className={`pt-16 md:pt-0 flex flex-col items-center`}>
       <Head>
@@ -358,14 +414,32 @@ const Home: NextPage = () => {
                 )}
                 <div>ID: {project._id}</div>
 
-                <div
+                <button
                   className="mt-5 p-2 text-white cursor-pointer text-sm hover:text-blue-200 bg-cyan-500 w-60 text-center rounded-md"
                   onClick={downloadSrc}
                 >
                   Download contract source
+                </button>
+
+                <div className="mt-2 border p-2">
+                  {/* Change metadata base uri */}
+                  <form className="flex flex-col" onSubmit={updateMetadataBaseUri}>
+                    <label htmlFor="baseUri">Update metadata base URI:</label>
+                    <input
+                      type="text"
+                      className="p-1 border w-92"
+                      name="baseTokenURI"
+                      defaultValue={baseTokenURI}
+                    />
+                    <button
+                      className="mt-5 p-2 text-white cursor-pointer text-sm hover:text-blue-200 bg-cyan-500 w-60 text-center rounded-md"
+                      type="submit"
+                    >
+                      Update
+                    </button>
+                  </form>
                 </div>
               </div>
-              
             </div>
 
             <div className="w-2/3 pl-10 justify-end flex flex-col pb-2">
@@ -415,8 +489,7 @@ const Home: NextPage = () => {
         )}
 
         <div className="w-2/3">
-          
-          {project && web3 && contract && networkId && (
+          {project && web3 && proxyContract && networkId && (
             <div>
               <div className="border"></div>
 
@@ -429,7 +502,7 @@ const Home: NextPage = () => {
                   <div className="text-sm">
                     [SC:{" "}
                     {networkId &&
-                      contract &&
+                      proxyContract &&
                       publicRuntimeConfig.proxyContractAddresses &&
                       publicRuntimeConfig.proxyContractAddresses[
                         networkId.toLowerCase()
@@ -438,76 +511,78 @@ const Home: NextPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex flex-col justify-center items-center">
-              <div className="mb-5 mt-5 text-lg font-semibold">Deployments:</div>
-              <div className="md:grid md:grid-cols-2 md:gap-10">
-                <div className="flex flex-col space-y-5">
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "chainbox"
-                    )}
-                    network="Chainbox [testnet]"
-                    networkId="chainbox"
-                    currentConnectedNetwork={networkId}
-                    gasPrices={gasPrices}
-                  />
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "rinkeby"
-                    )}
-                    network="Rinkeby [testnet]"
-                    networkId="rinkeby"
-                    currentConnectedNetwork={networkId}
-                    gasPrices={gasPrices}
-                  />
+                <div className="mb-5 mt-5 text-lg font-semibold">
+                  Deployments:
                 </div>
-                <div className="flex flex-col space-y-5 mt-5 md:mt-0">
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "ethereum"
-                    )}
-                    network="Ethereum"
-                    networkId="ethereum"
-                    currentConnectedNetwork={networkId}
-                    gasPrices={gasPrices}
-                  />
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "polygon"
-                    )}
-                    network="Polygon"
-                    networkId="polygon"
-                    currentConnectedNetwork={networkId}
-                    gasPrices={gasPrices}
-                  />
-                  <DeployBox
-                    project={project}
-                    web3={web3}
-                    contract={contract}
-                    item={deployments.find(
-                      (deployment) => deployment.network === "bsc"
-                    )}
-                    network="BSC"
-                    networkId="bsc"
-                    currentConnectedNetwork={networkId}
-                    gasPrices={gasPrices}
-                    disabled={true}
-                  />
+                <div className="md:grid md:grid-cols-2 md:gap-10">
+                  <div className="flex flex-col space-y-5">
+                    <DeployBox
+                      project={project}
+                      web3={web3}
+                      contract={proxyContract}
+                      item={deployments.find(
+                        (deployment) => deployment.network === "chainbox"
+                      )}
+                      network="Chainbox [testnet]"
+                      networkId="chainbox"
+                      currentConnectedNetwork={networkId}
+                      gasPrices={gasPrices}
+                    />
+                    <DeployBox
+                      project={project}
+                      web3={web3}
+                      contract={proxyContract}
+                      item={deployments.find(
+                        (deployment) => deployment.network === "rinkeby"
+                      )}
+                      network="Rinkeby [testnet]"
+                      networkId="rinkeby"
+                      currentConnectedNetwork={networkId}
+                      gasPrices={gasPrices}
+                    />
+                  </div>
+                  <div className="flex flex-col space-y-5 mt-5 md:mt-0">
+                    <DeployBox
+                      project={project}
+                      web3={web3}
+                      contract={proxyContract}
+                      item={deployments.find(
+                        (deployment) => deployment.network === "ethereum"
+                      )}
+                      network="Ethereum"
+                      networkId="ethereum"
+                      currentConnectedNetwork={networkId}
+                      gasPrices={gasPrices}
+                    />
+                    <DeployBox
+                      project={project}
+                      web3={web3}
+                      contract={proxyContract}
+                      item={deployments.find(
+                        (deployment) => deployment.network === "polygon"
+                      )}
+                      network="Polygon"
+                      networkId="polygon"
+                      currentConnectedNetwork={networkId}
+                      gasPrices={gasPrices}
+                    />
+                    <DeployBox
+                      project={project}
+                      web3={web3}
+                      contract={proxyContract}
+                      item={deployments.find(
+                        (deployment) => deployment.network === "bsc"
+                      )}
+                      network="BSC"
+                      networkId="bsc"
+                      currentConnectedNetwork={networkId}
+                      gasPrices={gasPrices}
+                      disabled={true}
+                    />
+                  </div>
                 </div>
-              </div>
               </div>
             </div>
           )}

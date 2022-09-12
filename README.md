@@ -9,6 +9,7 @@ Run backend services:
 
 1. Ganache, use ./etc/script/run-ganache.sh
 2. Run Mongodb
+2. Run chainbox-backend
 3. Run the development server:
 
 ```bash

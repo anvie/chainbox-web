@@ -51,7 +51,8 @@ const AddProjectDialog: FC<Props> = ({ show, onClose, onSuccess }) => {
       kind,
       capped,
       maxSupply,
-      free, payToMint, mintPrice, withWhitelist
+      free, payToMint, mintPrice, withWhitelist,
+      networkId: "chainbox"
     })
       .then((resp) => {
         if (resp.result) {
